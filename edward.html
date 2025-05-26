@@ -325,161 +325,118 @@
 <script>
 // --- весь JS для тренажёра ---
 const sentences = [
- // Give
   {ru: "Ты дашь мне эту сумку?", en: "Will you give me this bag?"},
   {ru: "Я дал ему первый урок вчера.", en: "I did give him the first lesson yesterday."},
   {ru: "Она даёт нам подарки каждый день.", en: "She does give us gifts every day."},
   {ru: "Почему ты не дал мне второй шанс?", en: "Why did you not give me a second chance?"},
   {ru: "Кто даст нам домашнее задание сегодня?", en: "Who will give us homework today?"},
-  
-  // Eat
   {ru: "Ты ешь дома сегодня?", en: "Do you eat at home today?"},
   {ru: "Мы ели вместе вчера.", en: "We did eat together yesterday."},
   {ru: "Он будет есть этот завтрак?", en: "Will he eat this breakfast?"},
   {ru: "Она не ест мясо.", en: "She does not eat meat."},
   {ru: "Что ты ел на завтрак?", en: "What did you eat for breakfast?"},
-  
-  // Like
   {ru: "Тебе нравится этот урок?", en: "Do you like this lesson?"},
   {ru: "Мне понравился твой подарок.", en: "I did like your gift."},
   {ru: "Ей понравится эта сумка?", en: "Will she like this bag?"},
   {ru: "Им не нравится первый дом.", en: "They do not like the first house."},
   {ru: "Почему тебе не понравилось мое имя?", en: "Why did you not like my name?"},
-  
-  // Want
   {ru: "Ты хочешь идти домой?", en: "Do you want to go home?"},
   {ru: "Я хотел этот урок вчера.", en: "I did want this lesson yesterday."},
   {ru: "Она захочет этот подарок?", en: "Will she want this gift?"},
   {ru: "Мы не хотим второй урок.", en: "We do not want the second lesson."},
   {ru: "Кто хотел эту сумку?", en: "Who did want this bag?"},
-  
-  // Know
   {ru: "Ты знаешь его имя?", en: "Do you know his name?"},
   {ru: "Я не знал об этом уроке.", en: "I did not know about this lesson."},
   {ru: "Она узнает о подарке завтра?", en: "Will she know about the gift tomorrow?"},
   {ru: "Мы знаем, где ты живёшь.", en: "We do know where you live."},
   {ru: "Кто знал, что ты придёшь?", en: "Who did know you would come?"},
-  
-  // Think
   {ru: "Ты думаешь о втором уроке?", en: "Do you think about the second lesson?"},
   {ru: "Я думал о тебе вчера.", en: "I did think about you yesterday."},
   {ru: "Она подумает о нашем предложении?", en: "Will she think about our offer?"},
   {ru: "Мы не думаем, что это хорошая идея.", en: "We do not think it is a good idea."},
   {ru: "О чём ты думал?", en: "What did you think about?"},
-// Understand (продолжение)
   {ru: "Я не понял твой вопрос.", en: "I did not understand your question."},
   {ru: "Она поймёт это объяснение?", en: "Will she understand this explanation?"},
   {ru: "Мы не понимаем первый урок.", en: "We do not understand the first lesson."},
   {ru: "Кто понял твою идею?", en: "Who did understand your idea?"},
-  
-  // Get
   {ru: "Ты получаешь много подарков?", en: "Do you get many gifts?"},
   {ru: "Я получил эту сумку вчера.", en: "I did get this bag yesterday."},
   {ru: "Она получит урок завтра?", en: "Will she get the lesson tomorrow?"},
   {ru: "Мы не получаем письма на дом.", en: "We do not get letters at home."},
   {ru: "Как ты получил этот подарок?", en: "How did you get this gift?"},
-  
-  // Live
   {ru: "Ты живёшь в этом доме?", en: "Do you live in this house?"},
   {ru: "Я жил здесь раньше.", en: "I did live here before."},
   {ru: "Она будет жить с нами?", en: "Will she live with us?"},
   {ru: "Мы не живём рядом с работой.", en: "We do not live near work."},
   {ru: "Где ты жил до этого?", en: "Where did you live before this?"},
-  
-  // Work
   {ru: "Ты работаешь сегодня?", en: "Do you work today?"},
   {ru: "Я работал вчера весь день.", en: "I did work all day yesterday."},
   {ru: "Он будет работать с этой сумкой?", en: "Will he work with this bag?"},
   {ru: "Мы не работаем по выходным.", en: "We do not work on weekends."},
   {ru: "Когда ты работал в последний раз?", en: "When did you work last time?"},
-  
-  // Forget
   {ru: "Ты часто забываешь имена?", en: "Do you often forget names?"},
   {ru: "Я забыл свою сумку дома.", en: "I did forget my bag at home."},
   {ru: "Она забудет про урок?", en: "Will she forget about the lesson?"},
   {ru: "Мы не забываем важные вещи.", en: "We do not forget important things."},
   {ru: "Что ты забыл вчера?", en: "What did you forget yesterday?"},
-  
-  // Go
   {ru: "Ты идёшь домой сейчас?", en: "Do you go home now?"},
   {ru: "Я ходил на первый урок вчера.", en: "I did go to the first lesson yesterday."},
   {ru: "Она пойдёт с нами?", en: "Will she go with us?"},
   {ru: "Мы не ходим туда часто.", en: "We do not go there often."},
   {ru: "Куда ты ходил вчера?", en: "Where did you go yesterday?"},
-// Try
   {ru: "Ты пробуешь новые вещи?", en: "Do you try new things?"},
   {ru: "Я пытался понять урок вчера.", en: "I did try to understand the lesson yesterday."},
   {ru: "Она попробует этот подарок?", en: "Will she try this gift?"},
   {ru: "Мы не пытаемся уйти рано.", en: "We do not try to leave early."},
   {ru: "Что ты пытался сделать?", en: "What did you try to do?"},
-  
-  // Ask
   {ru: "Ты спрашиваешь о домашнем задании?", en: "Do you ask about homework?"},
   {ru: "Я спросил его имя вчера.", en: "I did ask his name yesterday."},
   {ru: "Она спросит о первом уроке?", en: "Will she ask about the first lesson?"},
   {ru: "Мы не спрашиваем о личных вещах.", en: "We do not ask about personal things."},
   {ru: "О чём ты спрашивал?", en: "What did you ask about?"},
-  
-  // Say
   {ru: "Ты говоришь правду?", en: "Do you say the truth?"},
   {ru: "Я сказал ей об уроке вчера.", en: "I did say to her about the lesson yesterday."},
   {ru: "Он скажет нам своё имя?", en: "Will he say his name to us?"},
   {ru: "Мы не говорим такие вещи.", en: "We do not say such things."},
   {ru: "Что ты сказал ему?", en: "What did you say to him?"},
-  
-  // Come
   {ru: "Ты приходишь домой поздно?", en: "Do you come home late?"},
   {ru: "Я пришёл на урок вчера.", en: "I did come to the lesson yesterday."},
   {ru: "Она придёт к нам завтра?", en: "Will she come to us tomorrow?"},
   {ru: "Мы не приходим сюда часто.", en: "We do not come here often."},
   {ru: "Когда ты пришёл домой?", en: "When did you come home?"},
-  
-  // Feel
   {ru: "Ты чувствуешь себя хорошо сегодня?", en: "Do you feel good today?"},
   {ru: "Я чувствовал себя плохо вчера.", en: "I did feel bad yesterday."},
   {ru: "Она почувствует разницу?", en: "Will she feel the difference?"},
   {ru: "Мы не чувствуем холод.", en: "We do not feel cold."},
   {ru: "Как ты себя чувствовал после урока?", en: "How did you feel after the lesson?
-// Want (дополнительные)
   {ru: "Что ты хочешь на день рождения?", en: "What do you want for your birthday?"},
   {ru: "Он хотел пойти на первый урок?", en: "Did he want to go to the first lesson?"},
   {ru: "Мы захотим этот подарок?", en: "Will we want this gift?"},
-  
-  // Look
   {ru: "Ты смотришь на эту сумку?", en: "Do you look at this bag?"},
   {ru: "Я смотрел на твой подарок вчера.", en: "I did look at your gift yesterday."},
   {ru: "Она посмотрит на наш дом?", en: "Will she look at our home?"},
   {ru: "Мы не смотрим такие уроки.", en: "We do not look at such lessons."},
   {ru: "Как ты выглядел на вчерашней встрече?", en: "How did you look at yesterday's meeting?"},
-  
-  // See
   {ru: "Ты видишь мою сумку?", en: "Do you see my bag?"},
   {ru: "Я видел твой подарок вчера.", en: "I did see your gift yesterday."},
   {ru: "Она увидит наш новый дом?", en: "Will she see our new home?"},
   {ru: "Мы не видим смысла в этом.", en: "We do not see the point in this."},
   {ru: "Что ты видел на первом уроке?", en: "What did you see in the first lesson?"},
-  
-  // Talk
   {ru: "Ты разговариваешь с ней сегодня?", en: "Do you talk to her today?"},
   {ru: "Я разговаривал с учителем вчера.", en: "I did talk to the teacher yesterday."},
   {ru: "Он поговорит с нами об уроках?", en: "Will he talk to us about lessons?"},
   {ru: "Мы не разговариваем с ними.", en: "We do not talk to them."},
   {ru: "О чём вы разговаривали дома?", en: "What did you talk about at home?"},
-  
-  // Use
   {ru: "Ты используешь эту сумку?", en: "Do you use this bag?"},
   {ru: "Я использовал твой подарок вчера.", en: "I did use your gift yesterday."},
   {ru: "Она будет использовать наш урок?", en: "Will she use our lesson?"},
   {ru: "Мы не используем это дома.", en: "We do not use this at home."},
   {ru: "Как ты использовал этот метод?", en: "How did you use this method?"},
-  
-  // Speak
   {ru: "Ты говоришь по-английски?", en: "Do you speak English?"},
   {ru: "Я говорил с ней вчера.", en: "I did speak with her yesterday."},
   {ru: "Она будет говорить на уроке?", en: "Will she speak in the lesson?"},
   {ru: "Мы не говорим так громко.", en: "We do not speak so loudly."},
   {ru: "О чём ты говорил дома?", en: "What did you speak about at home?"},
-  // Need (продолжение)
   {ru: "Мне нужен был урок вчера.", en: "I did need the lesson yesterday."},
   {ru: "Ей понадобится твоя помощь?", en: "Will she need your help?"},
   {ru: "Нам не нужны эти подарки.", en: "We do not need these gifts."},
@@ -489,8 +446,6 @@ const sentences = [
   {ru: "Когда тебе понадобится эта сумка?", en: "When will you need this bag?"},
   {ru: "Зачем ему нужно было твоё имя?", en: "Why did he need your name?"},
   {ru: "Нам понадобится второй урок?", en: "Will we need the second lesson?"},
-  
-  // Дополнительные предложения с другими глаголами
   {ru: "Кто знает твоё имя?", en: "Who knows your name?"},
   {ru: "Где ты живёшь сейчас?", en: "Where do you live now?"},
   {ru: "Как часто ты ходишь домой?", en: "How often do you go home?"},
@@ -501,8 +456,6 @@ const sentences = [
   {ru: "Кто забудет принести сумку?", en: "Who will forget to bring the bag?"},
   {ru: "Как ты получишь этот подарок?", en: "How will you get this gift?"},
   {ru: "Зачем ты пробовал это снова?", en: "Why did you try this again?"},
-  
-  // Больше разнообразия
   {ru: "Я дам тебе эту сумку завтра.", en: "I will give you this bag tomorrow."},
   {ru: "Ты ел дома вчера?", en: "Did you eat at home yesterday?"},
   {ru: "Нам понравится этот урок?", en: "Will we like this lesson?"},
@@ -513,7 +466,6 @@ const sentences = [
   {ru: "Он живёт рядом с этим домом.", en: "He does live near this house."},
   {ru: "Ты будешь работать сегодня?", en: "Will you work today?"},
   {ru: "Я забыл свой подарок дома.", en: "I did forget my gift at home."},
-
  {ru: "Я попробую новую еду завтра.", en: "I will try new food tomorrow."},
   {ru: "Она не спрашивала о твоём имени.", en: "She did not ask about your name."},
   {ru: "Что ты скажешь на уроке?", en: "What will you say in the lesson?"},
@@ -521,8 +473,6 @@ const sentences = [
   {ru: "Ты чувствовал себя хорошо вчера?", en: "Did you feel good yesterday?"},
   {ru: "Кто захочет этот подарок?", en: "Who will want this gift?"},
   {ru: "Я не смотрел на эту сумку.", en: "I did not look at this bag."},
-  
-  // Продолжаем с разными комбинациями
   {ru: "Ты видел мой новый дом?", en: "Did you see my new home?"},
   {ru: "Мы поговорим об этом уроке завтра.", en: "We will talk about this lesson tomorrow."},
   {ru: "Они не используют эти сумки.", en: "They do not use these bags."},
@@ -531,8 +481,6 @@ const sentences = [
   {ru: "Ты даёшь мне этот подарок?", en: "Do you give me this gift?"},
   {ru: "Я ел дома вчера.", en: "I did eat at home yesterday."},
   {ru: "Ей понравится первый урок?", en: "Will she like the first lesson?"},
-  
-  // Новые комбинации
   {ru: "Мы хотим эту сумку.", en: "We do want this bag."},
   {ru: "Ты знал его имя?", en: "Did you know his name?"},
   {ru: "Я буду думать о твоём подарке.", en: "I will think about your gift."},
@@ -541,8 +489,6 @@ const sentences = [
   {ru: "Ты жил здесь раньше?", en: "Did you live here before?"},
   {ru: "Он работает дома сегодня.", en: "He does work at home today."},
   {ru: "Я не забуду твоё имя.", en: "I will not forget your name."},
-  
-  // Заключительные предложения
   {ru: "Куда ты пойдёшь после урока?", en: "Where will you go after the lesson?"},
   {ru: "Мы подарили ей сумку вчера.", en: "We did gift her a bag yesterday."},
   {ru: "Ты попробуешь первый урок?", en: "Will you try the first lesson?"},
