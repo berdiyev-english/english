@@ -1,7 +1,7 @@
 {
   "name": "Английский с нуля",
   "short_name": "B-ENG:Английский с нуля",
-  "start_url": "/resources/",
+  "start_url": "/english/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
