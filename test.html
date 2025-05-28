@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тренажёр: Собери английское предложение</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background:#f0f5fa; min-height:100vh;}
+    .container {max-width:500px; margin:0 auto; background:#fff; box-shadow:0 2px 16px rgba(135,152,172,0.18); border-radius:15px; padding:18px 8px 16px 8px; margin-top:20px; min-height:85vh; display:flex; flex-direction:column; justify-content:flex-start; box-sizing:border-box;}
+    .promo-block {display:flex; flex-direction:column; align-items:center; margin-bottom:20px; padding:10px 0 18px 0; border-bottom:2px solid #e3eaff;}
+    .promo-avatar {border-radius:50%; width:110px; height:110px; object-fit:cover; margin-bottom:8px; border:3px solid #d1e2fa;}
+    .promo-title {font-size:1.25em; font-weight:bold; color:#093c7f; margin-bottom:8px; margin-top:8px; text-align:center; letter-spacing:0.15em;}
+    .promo-desc {font-size:1.06em; color:#215086; margin-bottom:13px; text-align:center; font-weight:400; max-width:355px;}
+    .promo-btn {display:inline-block; background:#1f5bff; color:#fff; border:none; border-radius:8px; padding:11px 32px; font-size:1.08em; font-weight:500; text-decoration:none; box-shadow:0 2px 8px 0 #407cf888; margin-top:5px; margin-bottom:3px;}
+    .promo-btn:hover {background:#3e82fa;}
+    .sentence {font-size:1.38em; text-align:center; margin-bottom:16px; font-weight:bold; color:#23498d; background:#e9f1fc; border-radius:9px; padding:15px 10px 13px 10px; box-shadow:0 1px 7px #dae7ff30; border:1.5px solid #bddafb; max-width:96%; margin-left:auto; margin-right:auto;}
+    .assembled {min-height:40px; border:1.5px dashed #034a7d; border-radius:8px; background:#eaf5ff; color:#232e38; font-size:1.15em; margin-bottom:8px; padding:9px 5px 7px 8px; word-break:break-word; box-sizing:border-box; font-weight:500; letter-spacing:.5px;}
+    #scheme {text-align:center; margin-bottom:14px; margin-top:2px; font-size:1.06em; min-height:32px;}
+    .colored {font-weight:bold; padding:2px 8px; border-radius:7px; border-width:2px; border-style:solid; margin:0 4px 0 0; display:inline-block;}
+    .question {color:#222; background:#fff; border:2px solid #222;} /* Черная рамка */
+    .aux {color:#36924a; background:#eaffea; border:2px solid #36924a;} /* Зеленая рамка */
+    .subject {color:#db7700; background:#fff7e8; border:2px solid #db7700;} /* Оранжевая рамка */
+    .verb {color:#873fd7; background:#f1eafd; border:2px solid #873fd7;} /* Фиолетовая рамка */
+    .other {color:#1862c5; background:#e7f1ff; border:2px solid #1862c5;} /* Синяя рамка */
+    .word-cell {display:flex; align-items:center; margin-right:0px; margin-bottom:4px;}
+    .word-btn {background:transparent; border:none; margin:0; cursor:pointer; outline:none; position:relative; padding:0;} /* Убран padding из кнопки */
+    .word-btn-inner {padding:8px 12px; margin:0 3.5px 0 0; font-size:1.2em; display:flex; flex-direction:column; align-items:center;} /* Изменен padding и display */
+    .english-word {font-weight:bold;}
+    .transcription {font-size:0.7em; color:#555; font-weight:normal; margin-top:2px;} /* Стиль для транскрипции */
+
+    .word-btn.used .word-btn-inner {opacity:.45; text-decoration:line-through;}
+    .used {pointer-events:none;}
+    .sound-btn {background: #e3f2ff; color: #254696; border: none; border-radius: 7px; padding:3px 11px; font-size:1.13em; margin-left:4px; cursor:pointer; vertical-align:middle; height: 100%; display: flex; align-items: center; justify-content: center;} /* Выравнивание и размер */
+    .sound-btn:active {background:#c8dbf7;}
+    .result {font-weight:bold; font-size:1.13em; min-height:28px; text-align:center; margin-bottom:8px; color:#0e594d; transition:color .18s;}
+    .hint-block {border-top:1px solid #a3b8d9; padding-top:8px; margin-top:10px; font-size:1em; color:#55607d; margin-bottom:10px;}
+    .hint-block b {color:#1a388b;}
+    .controls {display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px; margin-bottom:4px;}
+    .mini-btn {background:#26b179; color:#fff; border:none; border-radius:7px; padding:9px 20px; font-size:1.1em; cursor:pointer; transition:background .20s;}
+    .mini-btn:disabled {background:#abd7c8; opacity:.75;}
+    .theory {background:#f5f7ff; color:#26345b; border:1.5px solid #b1c9ed; border-radius:10px; padding:18px 13px 10px 16px; margin:18px auto 0 auto; font-size:1.05em; box-shadow:0 2px 14px #c4d7ef18; max-width:95%; line-height:1.63;}
+    .theory-title {font-size:1.16em; color:#2a407f; font-weight:bold; margin-bottom:7px;}
+    .theory strong {color:#4767b9;}
+    .theory .remark {display:block; color:#b96924; margin-top:3px; font-style:italic; font-size:0.98em;}
+    .no-speech {background: #ffeaea; color: #b02323; padding: 12px 10px; border-radius:7px; text-align: center; margin:14px 0;}
+    @media (max-width:630px) {.word-btn-inner{padding:6px 7px; font-size:1em;}}
+    @media (max-width:600px){.container{max-width:99vw;} .sentence{font-size:1.09em;} .assembled{font-size:1.03em;}}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="promo-block">
+    <img class="promo-avatar"
+    src="https://static.tildacdn.info/tild3532-3739-4433-a633-613530366563/-/resize/504x/IMG_7738.PNG" alt="преподаватель">
+    <div class="promo-title">Соберите английское предложение</div>
+    <div class="promo-desc">Очень хорошее упражнение, чтобы начать говорить на английском и понимать его</div>
+    <a class="promo-btn" href="https://t.me/+NvMX2DrTa3w1NTVi" target="_blank">Бесплатный урок Английского</a>
+  </div>
+
+  <div id="noSpeechWarn" style="display:none;" class="no-speech">
+    📢 <b>Озвучка не поддерживается на этом устройстве или браузере.<br>Проверьте последние версии Google Chrome или Samsung Internet.<br>В Safari на iPhone/iPad работоспособность ограничена. </b>
+  </div>
+
+  <div class="sentence" id="russianSentence"></div>
+  <div class="assembled" id="assembled"></div>
+  <div id="scheme"></div>
+  <div class="words" id="words"></div>
+  <div class="controls">
+    <button class="mini-btn" onclick="clearAssembled()">Сбросить</button>
+    <button class="mini-btn" onclick="nextSentence(true)">Другое предложение</button>
+    <button class="mini-btn" onclick="playSound()" title="Озвучить перевод">🔊</button>
+  </div>
+  <div class="result" id="result"></div>
+  <div class="hint-block" id="hintblock"></div>
+  <div class="theory">
+    <div class="theory-title">Что такое вспомогательные глаголы?</div>
+    Вспомогательные глаголы (auxiliary verbs) — это служебные слова, которые сами по себе не переводятся, но помогают строить вопросы, отрицания и некоторые времена.<br><br>
+    Примеры (без "have"): do, does, did, will, am, is, are, was, were, can, could, shall, should, would, must.<br>
+    В каждом предложении ставится только один вспомогательный глагол!<br><br>
+    <b>Как строится вопрос:</b><br>
+    Если есть вопросительное слово (What, Where, Why, When, How, Who и др.), оно идёт в самом начале.<br>
+    Затем — вспомогательный глагол, подлежащее и смысловой глагол.<br>
+    Пример с вопросительным словом: Where do you live?<br>
+    Пример без вопросительного: Do you play football?<br><br>
+    <b>ВАЖНО!</b> Do, does, did не ставятся в обычном (утвердительном) предложении! Используйте их только для вопросов и отрицаний.<br>
+    Пример (утверждение): I play football.<br>
+    Пример (отрицание): I do not play football.<br>
+    Пример (вопрос): Do you play football?
+  </div>
+</div>
+<script>
+const sentences = [
+  // В виде: parts = ['question','aux','subject','verb','other']
+  // Добавлен массив transcriptions[] с русской транскрипцией
+  { ru: "Ты дашь мне эту сумку?", en: "Will you give me this bag?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ю]", "[гив]", "[ми]", "[зис]", "[бэг]"] },
+  { ru: "Я дал ему первый урок вчера.", en: "I gave him the first lesson yesterday.", parts: ["subject","verb","other","other","other","other","other"], transcriptions: ["[ай]", "[гэйв]", "[хим]", "[зэ]", "[фёрст]", "[лэсн]", "[йестэрдэй]"] },
+  { ru: "Она даёт нам подарки каждый день.", en: "She gives us gifts every day.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ши]", "[гивз]", "[ас]", "[гифтс]", "[эври]", "[дэй]"] },
+  { ru: "Почему ты не дал мне второй шанс?", en: "Why did you not give me a second chance?", parts: ["question","aux","subject","other","verb","other","other","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[нот]", "[гив]", "[ми]", "[э]", "[сэкэнд]", "[чанс]"] },
+  { ru: "Кто даст нам домашнее задание сегодня?", en: "Who will give us homework today?", parts: ["question","aux","verb","other","other","other"], transcriptions: ["[ху]", "[уил]", "[гив]", "[ас]", "[хоумворк]", "[тудэй]"] },
+  { ru: "Ты ешь дома сегодня?", en: "Do you eat at home today?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[иит]", "[эт]", "[хоум]", "[тудэй]"] },
+  { ru: "Мы ели вместе вчера.", en: "We ate together yesterday.", parts: ["subject","verb","other","other"], transcriptions: ["[уи]", "[эйт]", "[тугэзэр]", "[йестэрдэй]"] },
+  { ru: "Он будет есть этот завтрак?", en: "Will he eat this breakfast?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[хи]", "[иит]", "[зис]", "[брэкфэст]"] },
+  { ru: "Она не ест мясо.", en: "She does not eat meat.", parts: ["subject","aux","other","verb","other"], transcriptions: ["[ши]", "[даз]", "[нот]", "[иит]", "[миит]"] },
+  { ru: "Что ты ел на завтрак?", en: "What did you eat for breakfast?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[иит]", "[фор]", "[брэкфэст]"] },
+  { ru: "Тебе нравится этот урок?", en: "Do you like this lesson?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[лайк]", "[зис]", "[лэсн]"] },
+  { ru: "Мне понравился твой подарок.", en: "I liked your gift.", parts: ["subject","verb","other","other"], transcriptions: ["[ай]", "[лайкт]", "[йор]", "[гифт]"] },
+  { ru: "Ей понравится эта сумка?", en: "Will she like this bag?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[лайк]", "[зис]", "[бэг]"] },
+  { ru: "Им не нравится первый дом.", en: "They do not like the first house.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[зэй]", "[ду]", "[нот]", "[лайк]", "[зэ]", "[фёрст]", "[хаус]"] },
+  { ru: "Почему тебе не понравилось мое имя?", en: "Why did you not like my name?", parts: ["question","aux","subject","other","verb","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[нот]", "[лайк]", "[май]", "[нэйм]"] },
+  { ru: "Ты хочешь идти домой?", en: "Do you want to go home?", parts: ["aux","subject","verb","other","verb","other"], transcriptions: ["[ду]", "[ю]", "[уонт]", "[ту]", "[гоу]", "[хоум]"] },
+  { ru: "Я хотел этот суп вчера.", en: "I wanted this soup yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[уонтид]", "[зис]", "[сууп]", "[йестэрдэй]"] },
+  { ru: "Она захочет этот подарок?", en: "Will she want this gift?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[уонт]", "[зис]", "[гифт]"] },
+  { ru: "Мы не хотим второй урок.", en: "We do not want the second lesson.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[уонт]", "[зэ]", "[сэкэнд]", "[лэсн]"] },
+  { ru: "Кто хотел эту сумку?", en: "Who wanted this bag?", parts: ["question","verb","other","other"], transcriptions: ["[ху]", "[уонтид]", "[зис]", "[бэг]"] },
+  { ru: "Ты знаешь его имя?", en: "Do you know his name?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[ноу]", "[хиз]", "[нэйм]"] },
+  { ru: "Я не знал об этом уроке.", en: "I did not know about this lesson.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[ай]", "[дид]", "[нот]", "[ноу]", "[эбаут]", "[зис]", "[лэсн]"] },
+  { ru: "Она узнает о подарке завтра?", en: "Will she know about the gift tomorrow?", parts: ["aux","subject","verb","other","other","other","other"], transcriptions: ["[уил]", "[ши]", "[ноу]", "[эбаут]", "[зэ]", "[гифт]", "[туморроу]"] },
+  { ru: "Мы знаем, где ты живёшь.", en: "We know where you live.", parts: ["subject","verb","other","other","other"], transcriptions: ["[уи]", "[ноу]", "[уэр]", "[ю]", "[лив]"] },
+  { ru: "Кто знал, что ты придёшь?", en: "Who knew you would come?", parts: ["question","verb","other","other","other"], transcriptions: ["[ху]", "[нью]", "[ю]", "[вуд]", "[кам]"] },
+  { ru: "Ты думаешь о втором уроке?", en: "Do you think about the second lesson?", parts: ["aux","subject","verb","other","other","other","other"], transcriptions: ["[ду]", "[ю]", "[синк]", "[эбаут]", "[зэ]", "[сэкэнд]", "[лэсн]"] },
+  { ru: "Я думал о тебе вчера.", en: "I thought about you yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[сот]", "[эбаут]", "[ю]", "[йестэрдэй]"] },
+  { ru: "Она подумает о нашем предложении?", en: "Will she think about our offer?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[синк]", "[эбаут]", "[ауэр]", "[офэр]"] },
+  { ru: "Мы не думаем, что это хорошая идея.", en: "We do not think it is a good idea.", parts: ["subject","aux","other","verb","other","other","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[синк]", "[ит]", "[из]", "[э]", "[гуд]", "[айдииэ]"] },
+  { ru: "О чём ты думал?", en: "What did you think about?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[синк]", "[эбаут]"] },
+  { ru: "Я не понял твой вопрос.", en: "I did not understand your question.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[ай]", "[дид]", "[нот]", "[андэстэнд]", "[йор]", "[куэсчэн]"] },
+  { ru: "Она поймёт это объяснение?", en: "Will she understand this explanation?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[андэстэнд]", "[зис]", "[эксплэнэйшэн]"] },
+  { ru: "Мы не понимаем первый урок.", en: "We do not understand the first lesson.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[андэстэнд]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Кто понял твою идею?", en: "Who understood your idea?", parts: ["question","verb","other","other"], transcriptions: ["[ху]", "[андэстууд]", "[йор]", "[айдииэ]"] },
+  { ru: "Ты получаешь много подарков?", en: "Do you get many gifts?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[гет]", "[мэни]", "[гифтс]"] },
+  { ru: "Я получил эту сумку вчера.", en: "I got this bag yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[гот]", "[зис]", "[бэг]", "[йестэрдэй]"] },
+  { ru: "Она получит урок завтра?", en: "Will she get the lesson tomorrow?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[гет]", "[зэ]", "[лэсн]", "[туморроу]"] },
+  { ru: "Мы не получаем письма на дом.", en: "We do not get letters at home.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[гет]", "[лэтэрз]", "[эт]", "[хоум]"] },
+  { ru: "Как ты получил этот подарок?", en: "How did you get this gift?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[хау]", "[дид]", "[ю]", "[гет]", "[зис]", "[гифт]"] },
+  { ru: "Ты живёшь в этом доме?", en: "Do you live in this house?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[лив]", "[ин]", "[зис]", "[хаус]"] },
+  { ru: "Я жил здесь раньше.", en: "I lived here before.", parts: ["subject","verb","other","other"], transcriptions: ["[ай]", "[ливд]", "[хиэр]", "[бифор]"] },
+  { ru: "Она будет жить с нами?", en: "Will she live with us?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[лив]", "[уиз]", "[ас]"] },
+  { ru: "Мы не живём рядом с работой.", en: "We do not live near work.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[лив]", "[ниэр]", "[уорк]"] },
+  { ru: "Где ты жил до этого?", en: "Where did you live before this?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уэр]", "[дид]", "[ю]", "[лив]", "[бифор]", "[зис]"] },
+  { ru: "Ты работаешь сегодня?", en: "Do you work today?", parts: ["aux","subject","verb","other"], transcriptions: ["[ду]", "[ю]", "[уорк]", "[тудэй]"] },
+  { ru: "Я работал вчера весь день.", en: "I worked all day yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[уоркт]", "[ол]", "[дэй]", "[йестэрдэй]"] },
+  { ru: "Он будет работать с этой сумкой?", en: "Will he work with this bag?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[хи]", "[уорк]", "[уиз]", "[зис]", "[бэг]"] },
+  { ru: "Мы не работаем по выходным.", en: "We do not work on weekends.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[уорк]", "[он]", "[уиикэндз]"] },
+  { ru: "Когда ты работал в последний раз?", en: "When did you work last time?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уэн]", "[дид]", "[ю]", "[уорк]", "[ласт]", "[тайм]"] },
+  { ru: "Ты часто забываешь имена?", en: "Do you often forget names?", parts: ["aux","subject","other","verb","other"], transcriptions: ["[ду]", "[ю]", "[офэн]", "[форгет]", "[нэймз]"] },
+  { ru: "Я забыл свою сумку дома.", en: "I forgot my bag at home.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[форгот]", "[май]", "[бэг]", "[эт]", "[хоум]"] },
+  { ru: "Она забудет про урок?", en: "Will she forget about the lesson?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[форгет]", "[эбаут]", "[зэ]", "[лэсн]"] },
+  { ru: "Мы не забываем важные вещи.", en: "We do not forget important things.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[форгет]", "[импортэнт]", "[синз]"] },
+  { ru: "Что ты забыл вчера?", en: "What did you forget yesterday?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[форгет]", "[йестэрдэй]"] },
+  { ru: "Ты идёшь домой сейчас?", en: "Do you go home now?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[гоу]", "[хоум]", "[нау]"] },
+  { ru: "Я ходил на первый урок вчера.", en: "I went to the first lesson yesterday.", parts: ["subject","verb","other","other","other","other","other"], transcriptions: ["[ай]", "[уэнт]", "[ту]", "[зэ]", "[фёрст]", "[лэсн]", "[йестэрдэй]"] },
+  { ru: "Она пойдёт с нами?", en: "Will she go with us?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[гоу]", "[уиз]", "[ас]"] },
+  { ru: "Мы не ходим туда часто.", en: "We do not go there often.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[гоу]", "[зээр]", "[офэн]"] },
+  { ru: "Куда ты ходил вчера?", en: "Where did you go yesterday?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уэр]", "[дид]", "[ю]", "[гоу]", "[йестэрдэй]"] },
+  { ru: "Ты пробуешь новые вещи?", en: "Do you try new things?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[трай]", "[нью]", "[синз]"] },
+  { ru: "Я пытался понять его вчера.", en: "I tried to understand him yesterday.", parts: ["subject","verb","other","verb","other","other"], transcriptions: ["[ай]", "[трайд]", "[ту]", "[андэстэнд]", "[хим]", "[йестэрдэй]"] },
+  { ru: "Она попробует этот подарок?", en: "Will she try this gift?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[трай]", "[зис]", "[гифт]"] },
+  { ru: "Мы не пытаемся уйти рано.", en: "We do not try to leave early.", parts: ["subject","aux","other","verb","other","verb","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[трай]", "[ту]", "[лиив]", "[ёрли]"] },
+  { ru: "Что ты пытался сделать?", en: "What did you try to do?", parts: ["question","aux","subject","verb","other","verb"], transcriptions: ["[уот]", "[дид]", "[ю]", "[трай]", "[ту]", "[ду]"] },
+  { ru: "Ты спрашиваешь о домашнем задании?", en: "Do you ask about homework?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[аск]", "[эбаут]", "[хоумворк]"] },
+  { ru: "Я спросил его имя вчера.", en: "I asked his name yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[аскд]", "[хиз]", "[нэйм]", "[йестэрдэй]"] },
+  { ru: "Она спросит о первом уроке?", en: "Will she ask about the first lesson?", parts: ["aux","subject","verb","other","other","other","other"], transcriptions: ["[уил]", "[ши]", "[аск]", "[эбаут]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Мы не спрашиваем о личных вещах.", en: "We do not ask about personal things.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[аск]", "[эбаут]", "[пёрсэнэл]", "[синз]"] },
+  { ru: "О чём ты спрашивал?", en: "What did you ask about?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[аск]", "[эбаут]"] },
+  { ru: "Ты говоришь правду?", en: "Do you say the truth?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[сэй]", "[зэ]", "[труус]"] },
+  { ru: "Я сказал ей об уроке вчера.", en: "I said to her about the lesson yesterday.", parts: ["subject","verb","other","other","other","other","other","other"], transcriptions: ["[ай]", "[сэд]", "[ту]", "[хёр]", "[эбаут]", "[зэ]", "[лэсн]", "[йестэрдэй]"] },
+  { ru: "Он скажет нам своё имя?", en: "Will he say his name to us?", parts: ["aux","subject","verb","other","other","other","other"], transcriptions: ["[уил]", "[хи]", "[сэй]", "[хиз]", "[нэйм]", "[ту]", "[ас]"] },
+  { ru: "Мы не говорим такие вещи.", en: "We do not say such things.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[сэй]", "[сач]", "[синз]"] },
+  { ru: "Что ты сказал ему?", en: "What did you say to him?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[сэй]", "[ту]", "[хим]"] },
+  { ru: "Ты приходишь домой поздно?", en: "Do you come home late?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[кам]", "[хоум]", "[лэйт]"] },
+  { ru: "Я пришёл на урок вчера.", en: "I came to the lesson yesterday.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ай]", "[кэйм]", "[ту]", "[зэ]", "[лэсн]", "[йестэрдэй]"] },
+  { ru: "Она придёт к нам завтра?", en: "Will she come to us tomorrow?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[кам]", "[ту]", "[ас]", "[туморроу]"] },
+  { ru: "Мы не приходим сюда часто.", en: "We do not come here often.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[кам]", "[хиэр]", "[офэн]"] },
+  { ru: "Когда ты пришёл домой?", en: "When did you come home?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уэн]", "[дид]", "[ю]", "[кам]", "[хоум]"] },
+  { ru: "Ты чувствуешь себя хорошо сегодня?", en: "Do you feel good today?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[фиил]", "[гуд]", "[тудэй]"] },
+  { ru: "Я чувствовал себя плохо вчера.", en: "I felt bad yesterday.", parts: ["subject","verb","other","other"], transcriptions: ["[ай]", "[фелт]", "[бэд]", "[йестэрдэй]"] },
+  { ru: "Она почувствует разницу?", en: "Will she feel the difference?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[фиил]", "[зэ]", "[дифэрэнс]"] },
+  { ru: "Мы не чувствуем холод.", en: "We do not feel cold.", parts: ["subject","aux","other","verb","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[фиил]", "[коулд]"] },
+  { ru: "Как ты себя чувствовал после урока?", en: "How did you feel after the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[хау]", "[дид]", "[ю]", "[фиил]", "[афтэ]", "[зэ]", "[лэсн]"] },
+  { ru: "Что ты хочешь на день рождения?", en: "What do you want for your birthday?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[ду]", "[ю]", "[уонт]", "[фор]", "[йор]", "[бёрсдэй]"] },
+  { ru: "Он хотел пойти на первый урок?", en: "Did he want to go to the first lesson?", parts: ["aux","subject","verb","other","verb","other","other","other","other"], transcriptions: ["[дид]", "[хи]", "[уонт]", "[ту]", "[гоу]", "[ту]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Мы захотим этот подарок?", en: "Will we want this gift?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[уи]", "[уонт]", "[зис]", "[гифт]"] },
+  { ru: "Ты смотришь на эту сумку?", en: "Do you look at this bag?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[луук]", "[эт]", "[зис]", "[бэг]"] },
+  { ru: "Я смотрел на твой подарок вчера.", en: "I looked at your gift yesterday.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ай]", "[луукт]", "[эт]", "[йор]", "[гифт]", "[йестэрдэй]"] },
+  { ru: "Она посмотрит на наш дом?", en: "Will she look at our home?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[луук]", "[эт]", "[ауэр]", "[хоум]"] },
+  { ru: "Мы не смотрим такие уроки.", en: "We do not look at such lessons.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[луук]", "[эт]", "[сач]", "[лэснз]"] },
+  { ru: "Как ты выглядел на вчерашней встрече?", en: "How did you look at yesterday's meeting?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[хау]", "[дид]", "[ю]", "[луук]", "[эт]", "[йестэрдэйз]", "[миитин]"] },
+  { ru: "Ты видишь мою сумку?", en: "Do you see my bag?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[сии]", "[май]", "[бэг]"] },
+  { ru: "Я видел твой подарок вчера.", en: "I saw your gift yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[соо]", "[йор]", "[гифт]", "[йестэрдэй]"] },
+  { ru: "Она увидит наш новый дом?", en: "Will she see our new home?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[сии]", "[ауэр]", "[нью]", "[хоум]"] },
+  { ru: "Мы не видим смысла в этом.", en: "We do not see the point in this.", parts: ["subject","aux","other","verb","other","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[сии]", "[зэ]", "[пойнт]", "[ин]", "[зис]"] },
+  { ru: "Что ты видел на первом уроке?", en: "What did you see in the first lesson?", parts: ["question","aux","subject","verb","other","other","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[сии]", "[ин]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Ты разговариваешь с ней сегодня?", en: "Do you talk to her today?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[тоолк]", "[ту]", "[хёр]", "[тудэй]"] },
+  { ru: "Я разговаривал с учителем вчера.", en: "I talked to the teacher yesterday.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ай]", "[тоолкт]", "[ту]", "[зэ]", "[тиичэр]", "[йестэрдэй]"] },
+  { ru: "Он поговорит с нами об уроках?", en: "Will he talk to us about lessons?", parts: ["aux","subject","verb","other","other","other","other"], transcriptions: ["[уил]", "[хи]", "[тоолк]", "[ту]", "[ас]", "[эбаут]", "[лэснз]"] },
+  { ru: "Мы не разговариваем с ними.", en: "We do not talk to them.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[тоолк]", "[ту]", "[зэм]"] },
+  { ru: "О чём вы разговаривали дома?", en: "What did you talk about at home?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[тоолк]", "[эбаут]", "[эт]", "[хоум]"] },
+  { ru: "Ты используешь эту сумку?", en: "Do you use this bag?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[ду]", "[ю]", "[ююз]", "[зис]", "[бэг]"] },
+  { ru: "Я использовал твой подарок вчера.", en: "I used your gift yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[ююзд]", "[йор]", "[гифт]", "[йестэрдэй]"] },
+  { ru: "Она будет использовать наш урок?", en: "Will she use our lesson?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[ююз]", "[ауэр]", "[лэсн]"] },
+  { ru: "Мы не используем это дома.", en: "We do not use this at home.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[ююз]", "[зис]", "[эт]", "[хоум]"] },
+  { ru: "Как ты использовал этот метод?", en: "How did you use this method?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[хау]", "[дид]", "[ю]", "[ююз]", "[зис]", "[мэсод]"] },
+  { ru: "Ты говоришь по-английски?", en: "Do you speak English?", parts: ["aux","subject","verb","other"], transcriptions: ["[ду]", "[ю]", "[спиик]", "[инглиш]"] },
+  { ru: "Я говорил с ней вчера.", en: "I spoke with her yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[споук]", "[уиз]", "[хёр]", "[йестэрдэй]"] },
+  { ru: "Она будет говорить на уроке?", en: "Will she speak in the lesson?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[спиик]", "[ин]", "[зэ]", "[лэсн]"] },
+  { ru: "Мы не говорим так громко.", en: "We do not speak so loudly.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[спиик]", "[соу]", "[лаудли]"] },
+  { ru: "О чём ты говорил дома?", en: "What did you speak about at home?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[спиик]", "[эбаут]", "[эт]", "[хоум]"] },
+  { ru: "Мне нужны были деньги вчера.", en: "I needed the money yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[ниидид]", "[зэ]", "[мани]", "[йестэрдэй]"] },
+  { ru: "Ей понадобится твоя помощь?", en: "Will she need your help?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ши]", "[ниид]", "[йор]", "[хелп]"] },
+  { ru: "Нам не нужны эти подарки.", en: "We do not need these gifts.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[ду]", "[нот]", "[ниид]", "[зииз]", "[гифтс]"] },
+  { ru: "Что тебе нужно было для урока?", en: "What did you need for the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[дид]", "[ю]", "[ниид]", "[фор]", "[зэ]", "[лэсн]"] },
+  { ru: "Кому нужен этот дом?", en: "Who needs this house?", parts: ["question","verb","other","other"], transcriptions: ["[ху]", "[ниидз]", "[зис]", "[хаус]"] },
+  { ru: "Почему тебе нужно идти сейчас?", en: "Why do you need to go now?", parts: ["question","aux","subject","verb","other","verb","other"], transcriptions: ["[уай]", "[ду]", "[ю]", "[ниид]", "[ту]", "[гоу]", "[нау]"] },
+  { ru: "Когда тебе понадобится эта сумка?", en: "When will you need this bag?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уэн]", "[уил]", "[ю]", "[ниид]", "[зис]", "[бэг]"] },
+  { ru: "Зачем ему нужно было твоё имя?", en: "Why did he need your name?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уай]", "[дид]", "[хи]", "[ниид]", "[йор]", "[нэйм]"] },
+  { ru: "Нам понадобится второй урок?", en: "Will we need the second lesson?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[уи]", "[ниид]", "[зэ]", "[сэкэнд]", "[лэсн]"] },
+  { ru: "Кто знает твоё имя?", en: "Who knows your name?", parts: ["question","verb","other","other"], transcriptions: ["[ху]", "[ноуз]", "[йор]", "[нэйм]"] },
+  { ru: "Где ты живёшь сейчас?", en: "Where do you live now?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уэр]", "[ду]", "[ю]", "[лив]", "[нау]"] },
+  { ru: "Как часто ты ходишь домой?", en: "How often do you go home?", parts: ["question","other","aux","subject","verb","other"], transcriptions: ["[хау]", "[офэн]", "[ду]", "[ю]", "[гоу]", "[хоум]"] },
+  { ru: "Когда ты придёшь на урок?", en: "When will you come to the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уэн]", "[уил]", "[ю]", "[кам]", "[ту]", "[зэ]", "[лэсн]"] },
+  { ru: "Почему ты не хотел этот подарок?", en: "Why did you not want this gift?", parts: ["question","aux","subject","other","verb","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[нот]", "[уонт]", "[зис]", "[гифт]"] },
+  { ru: "Что ты думаешь о первом уроке?", en: "What do you think about the first lesson?", parts: ["question","aux","subject","verb","other","other","other","other"], transcriptions: ["[уот]", "[ду]", "[ю]", "[синк]", "[эбаут]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Где они работали вчера?", en: "Where did they work yesterday?", parts: ["question","aux","subject","verb","other"], transcriptions: ["[уэр]", "[дид]", "[зэй]", "[уорк]", "[йестэрдэй]"] },
+  { ru: "Кто забудет принести сумку?", en: "Who will forget to bring the bag?", parts: ["question","aux","verb","other","verb","other","other"], transcriptions: ["[ху]", "[уил]", "[форгет]", "[ту]", "[брин]", "[зэ]", "[бэг]"] },
+  { ru: "Как ты получишь этот подарок?", en: "How will you get this gift?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[хау]", "[уил]", "[ю]", "[гет]", "[зис]", "[гифт]"] },
+  { ru: "Зачем ты пробовал это снова?", en: "Why did you try this again?", parts: ["question","aux","subject","verb","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[трай]", "[зис]", "[эгэн]"] },
+  { ru: "Я дам тебе эту сумку завтра.", en: "I will give you this bag tomorrow.", parts: ["subject","aux","verb","other","other","other","other"], transcriptions: ["[ай]", "[уил]", "[гив]", "[ю]", "[зис]", "[бэг]", "[туморроу]"] },
+  { ru: "Ты ел дома вчера?", en: "Did you eat at home yesterday?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[дид]", "[ю]", "[иит]", "[эт]", "[хоум]", "[йестэрдэй]"] },
+  { ru: "Нам понравится этот урок?", en: "Will we like this lesson?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[уи]", "[лайк]", "[зис]", "[лэсн]"] },
+  { ru: "Она не знает твоего имени.", en: "She does not know your name.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[ши]", "[даз]", "[нот]", "[ноу]", "[йор]", "[нэйм]"] },
+  { ru: "Я думал о подарке весь день.", en: "I thought about the gift all day.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ай]", "[сот]", "[эбаут]", "[зэ]", "[гифт]", "[ол]", "[дэй]"] },
+  { ru: "Ты поймёшь этот урок?", en: "Will you understand this lesson?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[уил]", "[ю]", "[андэстэнд]", "[зис]", "[лэсн]"] },
+  { ru: "Мы не получили твоё сообщение.", en: "We did not get your message.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[уи]", "[дид]", "[нот]", "[гет]", "[йор]", "[мэсэдж]"] },
+  { ru: "Он живёт рядом с этим домом.", en: "He lives near this house.", parts: ["subject","verb","other","other","other"], transcriptions: ["[хи]", "[ливз]", "[ниэр]", "[зис]", "[хаус]"] },
+  { ru: "Ты будешь работать сегодня?", en: "Will you work today?", parts: ["aux","subject","verb","other"], transcriptions: ["[уил]", "[ю]", "[уорк]", "[тудэй]"] },
+  { ru: "Я забыл свои документы дома.", en: "I forgot my documents at home.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[форгот]", "[май]", "[докумэнтс]", "[эт]", "[хоум]"] },
+  { ru: "Я попробую новую еду завтра.", en: "I will try new food tomorrow.", parts: ["subject","aux","verb","other","other","other"], transcriptions: ["[ай]", "[уил]", "[трай]", "[нью]", "[фууд]", "[туморроу]"] },
+  { ru: "Она не спрашивала о твоём имени.", en: "She did not ask about your name.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[ши]", "[дид]", "[нот]", "[аск]", "[эбаут]", "[йор]", "[нэйм]"] },
+  { ru: "Что ты скажешь на уроке?", en: "What will you say in the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[уил]", "[ю]", "[сэй]", "[ин]", "[зэ]", "[лэсн]"] },
+  { ru: "Мы придём домой поздно.", en: "We will come home late.", parts: ["subject","aux","verb","other","other"], transcriptions: ["[уи]", "[уил]", "[кам]", "[хоум]", "[лэйт]"] },
+  { ru: "Ты чувствовал себя хорошо вчера?", en: "Did you feel good yesterday?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[дид]", "[ю]", "[фиил]", "[гуд]", "[йестэрдэй]"] },
+  { ru: "Кто захочет этот подарок?", en: "Who will want this gift?", parts: ["question","aux","verb","other","other"], transcriptions: ["[ху]", "[уил]", "[уонт]", "[зис]", "[гифт]"] },
+  { ru: "Я не смотрел на эту сумку.", en: "I did not look at this bag.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[ай]", "[дид]", "[нот]", "[луук]", "[эт]", "[зис]", "[бэг]"] },
+  { ru: "Ты видел мой новый дом?", en: "Did you see my new home?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[дид]", "[ю]", "[сии]", "[май]", "[нью]", "[хоум]"] },
+  { ru: "Мы поговорим об этом уроке завтра.", en: "We will talk about this lesson tomorrow.", parts: ["subject","aux","verb","other","other","other","other","other"], transcriptions: ["[уи]", "[уил]", "[тоолк]", "[эбаут]", "[зис]", "[лэсн]", "[туморроу]"] },
+  { ru: "Они не используют эти сумки.", en: "They do not use these bags.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[зэй]", "[ду]", "[нот]", "[ююз]", "[зииз]", "[бэгз]"] },
+  { ru: "Кто говорил с тобой вчера?", en: "Who spoke with you yesterday?", parts: ["question","verb","other","other","other"], transcriptions: ["[ху]", "[споук]", "[уиз]", "[ю]", "[йестэрдэй]"] },
+  { ru: "Нам нужно идти домой сейчас?", en: "Do we need to go home now?", parts: ["aux","subject","verb","other","verb","other"], transcriptions: ["[ду]", "[уи]", "[ниид]", "[ту]", "[гоу]", "[нау]"] },
+  { ru: "Ты даёшь мне этот подарок?", en: "Do you give me this gift?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[гив]", "[ми]", "[зис]", "[гифт]"] },
+  { ru: "Я ел дома вчера.", en: "I ate at home yesterday.", parts: ["subject","verb","other","other","other"], transcriptions: ["[ай]", "[эйт]", "[эт]", "[хоум]", "[йестэрдэй]"] },
+  { ru: "Ей понравится первый урок?", en: "Will she like the first lesson?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ши]", "[лайк]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Мы хотим эту сумку.", en: "We want this bag.", parts: ["subject","verb","other","other"], transcriptions: ["[уи]", "[уонт]", "[зис]", "[бэг]"] },
+  { ru: "Ты знал его имя?", en: "Did you know his name?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[дид]", "[ю]", "[ноу]", "[хиз]", "[нэйм]"] },
+  { ru: "Я буду думать о твоём подарке.", en: "I will think about your gift.", parts: ["subject","aux","verb","other","other","other"], transcriptions: ["[ай]", "[уил]", "[синк]", "[эбаут]", "[йор]", "[гифт]"] },
+  { ru: "Она не понимает этот урок.", en: "She does not understand this lesson.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[ши]", "[даз]", "[нот]", "[андэстэнд]", "[зис]", "[лэсн]"] },
+  { ru: "Мы получим новый дом?", en: "Will we get a new home?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[уи]", "[гет]", "[э]", "[нью]", "[хоум]"] },
+  { ru: "Ты жил здесь раньше?", en: "Did you live here before?", parts: ["aux","subject","verb","other","other"], transcriptions: ["[дид]", "[ю]", "[лив]", "[хиэр]", "[бифор]"] },
+  { ru: "Он работает дома сегодня.", en: "He works at home today.", parts: ["subject","verb","other","other","other"], transcriptions: ["[хи]", "[уоркс]", "[эт]", "[хоум]", "[тудэй]"] },
+  { ru: "Я не забуду твоё имя.", en: "I will not forget your name.", parts: ["subject","aux","other","verb","other","other"], transcriptions: ["[ай]", "[уил]", "[нот]", "[форгет]", "[йор]", "[нэйм]"] },
+  { ru: "Куда ты пойдёшь после урока?", en: "Where will you go after the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уэр]", "[уил]", "[ю]", "[гоу]", "[афтэ]", "[зэ]", "[лэсн]"] },
+  { ru: "Мы подарили ей сумку вчера.", en: "We gave her a bag yesterday.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[уи]", "[гэйв]", "[хёр]", "[э]", "[бэг]", "[йестэрдэй]"] },
+  { ru: "Ты попробуешь первый урок?", en: "Will you try the first lesson?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ю]", "[трай]", "[зэ]", "[фёрст]", "[лэсн]"] },
+  { ru: "Я не спрашивал о твоём доме.", en: "I did not ask about your home.", parts: ["subject","aux","other","verb","other","other","other"], transcriptions: ["[ай]", "[дид]", "[нот]", "[аск]", "[эбаут]", "[йор]", "[хоум]"] },
+  { ru: "Что она скажет на уроке?", en: "What will she say in the lesson?", parts: ["question","aux","subject","verb","other","other","other"], transcriptions: ["[уот]", "[уил]", "[ши]", "[сэй]", "[ин]", "[зэ]", "[лэсн]"] }
+];
+
+let current = 0, assembledWords = [], wordOrder = [], wordOrderParts = [], wordTranscriptions = [];
+let prevIdx = -1, allowInput = true, usedWordByIndex = [], speechAvailable = false;
+
+const COLOR_CLASSES = {
+  question: "question",
+  aux: "aux",
+  subject: "subject",
+  verb: "verb",
+  other: "other"
+};
+
+// ---- SPEECH SYNTHESIS ----
+function getVoicesSync(cb) {
+  let voices = window.speechSynthesis.getVoices();
+  if (voices && voices.length) {cb(voices); return;}
+  window.speechSynthesis.onvoiceschanged = function() {
+    voices = window.speechSynthesis.getVoices();
+    cb(voices);
+  };
+}
+function selectEnglishVoice(voices) {
+  return (
+    voices.find(v => v.lang === "en-US" && v.localService) ||
+    voices.find(v => v.lang && v.lang.indexOf("en") === 0) ||
+    voices[0] ||
+    null
+  );
+}
+function playSound(){
+  if(!speechAvailable) return;
+  window.speechSynthesis.cancel();
+  getVoicesSync(function(voices){
+    const utt = new window.SpeechSynthesisUtterance(sentences[current].en);
+    utt.lang = "en-US";
+    utt.rate = 0.7;
+    utt.voice = selectEnglishVoice(voices);
+    window.speechSynthesis.speak(utt);
+  });
+}
+function playWord(word){
+  if(!speechAvailable) return;
+  window.speechSynthesis.cancel();
+  getVoicesSync(function(voices){
+    const u = new window.SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    u.rate = 0.7;
+    u.voice = selectEnglishVoice(voices);
+    window.speechSynthesis.speak(u);
+  });
+}
+// --------------------------------
+
+// Функция для получения читабельного названия части речи
+function prettyPart(part) {
+  switch(part){
+    case "question": return "Вопр. слово";
+    case "aux": return "Вспом. глагол";
+    case "subject": return "Подлежащее";
+    case "verb": return "Сказуемое";
+    case "other": return "Остальное";
+    default: return "";
+  }
+}
+
+// ---------------------------
+function shuffle(arr) {
+  for(let i = arr.length-1; i > 0; i--) {
+    let j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function showSentence(idx) {
+  current = idx;
+  prevIdx = idx;
+  assembledWords = [];
+  allowInput = true;
+  usedWordByIndex = [];
+  document.getElementById('russianSentence').innerText = sentences[idx].ru;
+  document.getElementById('result').innerText = '';
+  document.getElementById('assembled').innerHTML = '';
+  wordOrder = sentences[idx].en.replace(/[.,?!]/g, '').split(' ');
+  wordOrderParts = sentences[idx].parts;
+  wordTranscriptions = sentences[idx].transcriptions; // Получаем транскрипции
+
+  // Схема: отображаем названия частей речи
+  document.getElementById('scheme').innerHTML = wordOrderParts.map(part =>
+    `<span class="colored ${COLOR_CLASSES[part]}">${prettyPart(part)}</span>`
+    ).join(" ");
+
+  // Перемешиваем слова, сохраняя их оригинальный индекс и транскрипцию
+  let shuffledWords = wordOrder.map((w,i)=>({word:w, original_idx:i, transcription: wordTranscriptions[i]}));
+  shuffle(shuffledWords);
+
+  let html = '';
+  shuffledWords.forEach((obj, i) => {
+    // Используем original_idx для получения правильной части речи
+    let wType = wordOrderParts[obj.original_idx];
+    html += `<span class="word-cell" id="word-cell-${i}">
+      <button class="word-btn" id="word-btn-${i}" type="button" onclick="selectWord(this, '${obj.word.replaceAll("'", "\\'")}',${i})">
+        <span class="word-btn-inner colored ${COLOR_CLASSES[wType]}">
+            <span class="english-word">${obj.word}</span>
+            <span class="transcription">${obj.transcription || ''}</span> <!-- Отображаем транскрипцию -->
+        </span>
+      </button>
+      <button class="sound-btn" onclick="event.stopPropagation();playWord('${obj.word.replaceAll("'", "\\'")}');return false;" title="Прослушать слово">🔊</button>
+    </span>`;
+    usedWordByIndex[i] = false;
+  });
+  document.getElementById('words').innerHTML = html;
+  updateButtonsState(); // Обновляем состояние кнопок после их создания
+  document.getElementById('hintblock').innerHTML = ''; // Убрана подсказка о типе предложения
+}
+
+function selectWord(btn, word, idx) {
+  // Логика выбора слова остается прежней - только правильное слово по порядку
+  if(!allowInput || btn.classList.contains('used')) return;
+  let expectedWord = wordOrder[assembledWords.length]; // Следующее ожидаемое слово
+  if (word !== expectedWord) return; // Разрешаем выбрать только следующее правильное слово
+
+  assembledWords.push(word);
+  btn.classList.add('used');
+  usedWordByIndex[idx] = true; // Отмечаем кнопку как использованную
+  updateAssembled(); // Обновляем собранное предложение
+  document.getElementById('result').innerText = ''; // Очищаем сообщение о результате
+  updateButtonsState(); // Обновляем состояние кнопок
+
+  if(assembledWords.length === wordOrder.length) {
+    allowInput = false;
+    playSound();
+    setTimeout(() => checkSentence(true), 300);
+  }
+}
+
+function updateAssembled() {
+  // Построить предложение с разметкой частей речи
+  let html = '';
+  for(let i=0;i<assembledWords.length;i++) {
+    // Находим индекс текущего слова в оригинальном wordOrder, чтобы определить его часть речи
+    // Ищем первое неиспользованное слово с таким же текстом в оригинальном порядке
+    let originalIdx = -1;
+    let tempAssembled = assembledWords.slice(0, i); // Слова, которые уже добавлены
+    for(let j=0; j < wordOrder.length; j++){
+        if(wordOrder[j] === assembledWords[i]){
+            // Проверяем, сколько раз это слово уже встречалось в tempAssembled
+            let usedCount = tempAssembled.filter(w => w === assembledWords[i]).length;
+             // Проверяем, сколько раз это слово встречается в wordOrder до текущего индекса j
+            let originalCount = wordOrder.slice(0, j+1).filter(w => w === assembledWords[i]).length;
+
+            if(usedCount < originalCount){
+                 originalIdx = j;
+                 break;
+            }
+        }
+    }
+
+    let pClass = COLOR_CLASSES[wordOrderParts[originalIdx]] || COLOR_CLASSES.other;
+    html += `<span class="colored ${pClass}" style="margin-right:4px">${assembledWords[i]}</span> `;
+  }
+  document.getElementById('assembled').innerHTML = html.trim();
+}
+
+
+function updateButtonsState() {
+  const btns = document.querySelectorAll('.word-btn');
+  let expectedWord = wordOrder[assembledWords.length]; // Следующее ожидаемое слово
+
+  btns.forEach((btn) => {
+    let btnWord = btn.querySelector('.english-word').innerText.trim(); // Получаем только английское слово
+    let isUsed = btn.classList.contains('used');
+
+    if (isUsed) {
+      btn.disabled = true;
+    } else {
+      // Кнопка активна только если это следующее ожидаемое слово и ввод разрешен
+      btn.disabled = !allowInput || btnWord !== expectedWord;
+    }
+  });
+}
+
+
+function checkSentence(autoNext=false) {
+  let correct = wordOrder.join(' ').toLowerCase().trim();
+  let user = assembledWords.join(' ').toLowerCase().trim();
+  if(!user) {
+    document.getElementById('result').innerText = "Пожалуйста, соберите предложение.";
+    allowInput = true;
+    updateButtonsState();
+    return;
+  }
+  if(user === correct){
+      document.getElementById('result').innerText = "✅ Правильно!";
+      updateAssembled(); // Показываем правильное предложение с разметкой
+      if(autoNext) setTimeout(() => nextSentence(false), 1100);
+  } else {
+      document.getElementById('result').innerText = "❌ Ошибка в логике сборки.";
+      allowInput = true;
+      clearAssembled(); // Сбрасываем, если ошибка
+  }
+}
+
+function clearAssembled() {
+  allowInput = true;
+  assembledWords = [];
+  // Сбрасываем состояние использованных кнопок
+  const btns = document.querySelectorAll('.word-btn');
+  btns.forEach(btn => {
+      btn.classList.remove('used');
+      btn.disabled = false; // Разблокируем все кнопки
+  });
+  document.getElementById('assembled').innerHTML = '';
+  updateButtonsState(); // Обновляем состояние кнопок по логике (только первое слово активно)
+  document.getElementById('result').innerText = '';
+}
+function nextSentence() {
+  let next;
+  do {
+    next = Math.floor(Math.random() * sentences.length);
+  } while(next === prevIdx && sentences.length>1);
+  showSentence(next);
+  document.getElementById('result').innerText = '';
+}
+function checkSpeechSupport() {
+  if (typeof window.speechSynthesis !== "object" || typeof window.SpeechSynthesisUtterance !== "function") {
+    document.getElementById("noSpeechWarn").style.display = "block";
+    speechAvailable = false;
+    return;
+  }
+  getVoicesSync(function(voices){
+    if (!voices || !voices.length) {
+      document.getElementById("noSpeechWarn").style.display = "block";
+      speechAvailable = false;
+    } else {
+      document.getElementById("noSpeechWarn").style.display = "none";
+      speechAvailable = true;
+    }
+  });
+}
+window.onload = () => {
+  checkSpeechSupport();
+  showSentence(Math.floor(Math.random()*sentences.length));
+};
+</script>
+</body>
+</html>
