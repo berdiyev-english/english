@@ -15,6 +15,7 @@
     .promo-btn:hover {background:#3e82fa;}
     .sentence {font-size:1.38em; text-align:center; margin-bottom:16px; font-weight:bold; color:#23498d; background:#e9f1fc; border-radius:9px; padding:15px 10px 13px 10px; box-shadow:0 1px 7px #dae7ff30; border:1.5px solid #bddafb; max-width:96%; margin-left:auto; margin-right:auto;}
     .assembled {min-height:40px; border:1.5px dashed #034a7d; border-radius:8px; background:#eaf5ff; color:#232e38; font-size:1.15em; margin-bottom:8px; padding:9px 5px 7px 8px; word-break:break-word; box-sizing:border-box; font-weight:500; letter-spacing:.5px;}
+    #scheme-title {text-align:center; font-size:1.1em; font-weight:bold; color:#23498d; margin-bottom:5px;} /* Стиль для заголовка схемы */
     #scheme {text-align:center; margin-bottom:14px; margin-top:2px; font-size:1.06em; min-height:32px;}
     .colored {font-weight:bold; padding:2px 8px; border-radius:7px; border-width:2px; border-style:solid; margin:0 4px 0 0; display:inline-block;}
     .question {color:#222; background:#fff; border:2px solid #222;} /* Черная рамка */
@@ -27,7 +28,6 @@
     .word-btn-inner {padding:8px 12px; margin:0 3.5px 0 0; font-size:1.2em; display:flex; flex-direction:column; align-items:center;} /* Изменен padding и display */
     .english-word {font-weight:bold;}
     .transcription {font-size:0.7em; color:#555; font-weight:normal; margin-top:2px;} /* Стиль для транскрипции */
-
     .word-btn.used .word-btn-inner {opacity:.45; text-decoration:line-through;}
     .used {pointer-events:none;}
     .sound-btn {background: #e3f2ff; color: #254696; border: none; border-radius: 7px; padding:3px 11px; font-size:1.13em; margin-left:4px; cursor:pointer; vertical-align:middle; height: 100%; display: flex; align-items: center; justify-content: center;} /* Выравнивание и размер */
@@ -43,7 +43,14 @@
     .theory strong {color:#4767b9;}
     .theory .remark {display:block; color:#b96924; margin-top:3px; font-style:italic; font-size:0.98em;}
     .no-speech {background: #ffeaea; color: #b02323; padding: 12px 10px; border-radius:7px; text-align: center; margin:14px 0;}
-    @media (max-width:630px) {.word-btn-inner{padding:6px 7px; font-size:1em;}}
+
+    /* Медиа-запросы для адаптивности */
+    @media (max-width:630px) {
+        .word-btn-inner {padding:6px 7px; font-size:1em;}
+        /* Увеличение размера английского слова на телефоне */
+        .word-btn-inner .english-word {font-size: 1.3em;} /* Увеличено */
+        .word-btn-inner .transcription {font-size: 0.6em;} /* Пропорционально уменьшено */
+    }
     @media (max-width:600px){.container{max-width:99vw;} .sentence{font-size:1.09em;} .assembled{font-size:1.03em;}}
   </style>
 </head>
@@ -64,6 +71,7 @@
 
   <div class="sentence" id="russianSentence"></div>
   <div class="assembled" id="assembled"></div>
+  <div id="scheme-title">Схема построения предложения:</div> <!-- Добавлен заголовок для схемы -->
   <div id="scheme"></div>
   <div class="words" id="words"></div>
   <div class="controls">
@@ -93,10 +101,11 @@
 const sentences = [
   // В виде: parts = ['question','aux','subject','verb','other']
   // Добавлен массив transcriptions[] с русской транскрипцией
+  { ru: "Что тебе нужно?", en: "What do you need?", parts: ["question","aux","subject","verb"], transcriptions: ["[уот]", "[ду]", "[ю]", "[ниид]"] },
   { ru: "Ты дашь мне эту сумку?", en: "Will you give me this bag?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[уил]", "[ю]", "[гив]", "[ми]", "[зис]", "[бэг]"] },
-  { ru: "Я дал ему первый урок вчера.", en: "I gave him the first lesson yesterday.", parts: ["subject","verb","other","other","other","other","other"], transcriptions: ["[ай]", "[гэйв]", "[хим]", "[зэ]", "[фёрст]", "[лэсн]", "[йестэрдэй]"] },
-  { ru: "Она даёт нам подарки каждый день.", en: "She gives us gifts every day.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ши]", "[гивз]", "[ас]", "[гифтс]", "[эври]", "[дэй]"] },
-  { ru: "Почему ты не дал мне второй шанс?", en: "Why did you not give me a second chance?", parts: ["question","aux","subject","other","verb","other","other","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[нот]", "[гив]", "[ми]", "[э]", "[сэкэнд]", "[чанс]"] },
+  { ru: "Она даёт нам подарки каждый день.",en: "She gives us gifts every day.", parts: ["subject","verb","other","other","other","other"], transcriptions: ["[ши]", "[гивз]", "[ас]", "[гифтс]", "[эври]", "[дэй]"] },
+  { ru: "Я дал ему первую книгу вчера.", en: "I gave him the first book yesterday.", parts: ["subject","verb","other","other","other","other","other"], transcriptions: ["[ай]", "[гэйв]", "[хим]", "[зэ]", "[фёрст]", "[лэсн]", "[йестэрдэй]"] },
+  { ru: "Почему ты не дал мне второй шанс?",en: "Why did you not give me a second chance?", parts: ["question","aux","subject","other","verb","other","other","other","other"], transcriptions: ["[уай]", "[дид]", "[ю]", "[нот]", "[гив]", "[ми]", "[э]", "[сэкэнд]", "[чанс]"] },
   { ru: "Кто даст нам домашнее задание сегодня?", en: "Who will give us homework today?", parts: ["question","aux","verb","other","other","other"], transcriptions: ["[ху]", "[уил]", "[гив]", "[ас]", "[хоумворк]", "[тудэй]"] },
   { ru: "Ты ешь дома сегодня?", en: "Do you eat at home today?", parts: ["aux","subject","verb","other","other","other"], transcriptions: ["[ду]", "[ю]", "[иит]", "[эт]", "[хоум]", "[тудэй]"] },
   { ru: "Мы ели вместе вчера.", en: "We ate together yesterday.", parts: ["subject","verb","other","other"], transcriptions: ["[уи]", "[эйт]", "[тугэзэр]", "[йестэрдэй]"] },
@@ -401,19 +410,20 @@ function selectWord(btn, word, idx) {
 function updateAssembled() {
   // Построить предложение с разметкой частей речи
   let html = '';
-  for(let i=0;i<assembledWords.length;i++) {
-    // Находим индекс текущего слова в оригинальном wordOrder, чтобы определить его часть речи
-    // Ищем первое неиспользованное слово с таким же текстом в оригинальном порядке
-    let originalIdx = -1;
-    let tempAssembled = assembledWords.slice(0, i); // Слова, которые уже добавлены
-    for(let j=0; j < wordOrder.length; j++){
-        if(wordOrder[j] === assembledWords[i]){
-            // Проверяем, сколько раз это слово уже встречалось в tempAssembled
-            let usedCount = tempAssembled.filter(w => w === assembledWords[i]).length;
-             // Проверяем, сколько раз это слово встречается в wordOrder до текущего индекса j
-            let originalCount = wordOrder.slice(0, j+1).filter(w => w === assembledWords[i]).length;
+  let tempAssembledCount = {}; // Временный счетчик для повторяющихся слов
 
-            if(usedCount < originalCount){
+  for(let i=0;i<assembledWords.length;i++) {
+    let currentWord = assembledWords[i];
+    // Увеличиваем счетчик для текущего слова
+    tempAssembledCount[currentWord] = (tempAssembledCount[currentWord] || 0) + 1;
+
+    // Находим индекс текущего слова в оригинальном wordOrder, учитывая повторы
+    let originalIdx = -1;
+    let count = 0;
+    for(let j=0; j < wordOrder.length; j++){
+        if(wordOrder[j] === currentWord){
+            count++;
+            if(count === tempAssembledCount[currentWord]){
                  originalIdx = j;
                  break;
             }
@@ -421,7 +431,7 @@ function updateAssembled() {
     }
 
     let pClass = COLOR_CLASSES[wordOrderParts[originalIdx]] || COLOR_CLASSES.other;
-    html += `<span class="colored ${pClass}" style="margin-right:4px">${assembledWords[i]}</span> `;
+    html += `<span class="colored ${pClass}" style="margin-right:4px">${currentWord}</span> `;
   }
   document.getElementById('assembled').innerHTML = html.trim();
 }
