@@ -5,7 +5,7 @@
   <title>Тренажёр: Собери английское предложение</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background:#f0f5fa; min-height:100vh;}
+body {margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background:#f0f5fa; min-height:100vh;}
     .container {max-width:500px; margin:0 auto; background:#fff; box-shadow:0 2px 16px rgba(135,152,172,0.18); border-radius:15px; padding:18px 8px 16px 8px; margin-top:20px; min-height:85vh; display:flex; flex-direction:column; justify-content:flex-start; box-sizing:border-box;}
     .promo-block {display:flex; flex-direction:column; align-items:center; margin-bottom:20px; padding:10px 0 18px 0; border-bottom:2px solid #e3eaff;}
     .promo-avatar {border-radius:50%; width:110px; height:110px; object-fit:cover; margin-bottom:8px; border:3px solid #d1e2fa;}
@@ -23,14 +23,18 @@
     .subject {color:#db7700; background:#fff7e8; border:2px solid #db7700;} /* Оранжевая рамка */
     .verb {color:#873fd7; background:#f1eafd; border:2px solid #873fd7;} /* Фиолетовая рамка */
     .other {color:#1862c5; background:#e7f1ff; border:2px solid #1862c5;} /* Синяя рамка */
-    .word-cell {display:flex; align-items:center; margin-right:0px; margin-bottom:4px;}
-    .word-btn {background:transparent; border:none; margin:0; cursor:pointer; outline:none; position:relative; padding:0;} /* Убран padding из кнопки */
-    .word-btn-inner {padding:8px 12px; margin:0 3.5px 0 0; font-size:1.2em; display:flex; flex-direction:column; align-items:center;} /* Изменен padding и display */
-    .english-word {font-weight:bold;}
-    .transcription {font-size:0.7em; color:#555; font-weight:normal; margin-top:2px;} /* Стиль для транскрипции */
+
+    /* Изменения для кнопок слов */
+    .words {display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px;} /* Уменьшен gap */
+    .word-cell {display: flex; align-items: stretch; margin-right: 0; margin-bottom: 4px;} /* align-items: stretch для выравнивания */
+    .word-btn {background: transparent; border: none; margin: 0; cursor: pointer; outline: none; position: relative; padding: 0; flex-grow: 1; display: flex;} /* flex-grow 1 для заполнения, display flex для выравнивания содержимого */
+    .word-btn-inner {padding: 12px 15px; font-size: 1.3em; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; } /* Увеличен font-size, flex для центрирования */
+    .english-word {font-weight: bold; font-size: 1.2em;} /* Увеличено относительно родителя */
+    .transcription {font-size: 0.6em; color:#555; font-weight:normal; margin-top: 2px; } /* Уменьшено относительно родителя */
+
     .word-btn.used .word-btn-inner {opacity:.45; text-decoration:line-through;}
     .used {pointer-events:none;}
-    .sound-btn {background: #e3f2ff; color: #254696; border: none; border-radius: 7px; padding:3px 11px; font-size:1.13em; margin-left:4px; cursor:pointer; vertical-align:middle; height: 100%; display: flex; align-items: center; justify-content: center;} /* Выравнивание и размер */
+    .sound-btn {background: #e3f2ff; color: #254696; border: none; border-radius: 7px; padding: 0 10px; font-size: 1.13em; margin-left: 4px; cursor: pointer; vertical-align: middle; height: auto; min-height: 44px; display: flex; align-items: center; justify-content: center;} /* Адаптирован padding и min-height */
     .sound-btn:active {background:#c8dbf7;}
     .result {font-weight:bold; font-size:1.13em; min-height:28px; text-align:center; margin-bottom:8px; color:#0e594d; transition:color .18s;}
     .hint-block {border-top:1px solid #a3b8d9; padding-top:8px; margin-top:10px; font-size:1em; color:#55607d; margin-bottom:10px;}
@@ -45,12 +49,37 @@
     .no-speech {background: #ffeaea; color: #b02323; padding: 12px 10px; border-radius:7px; text-align: center; margin:14px 0;}
 
     /* Медиа-запросы для адаптивности */
-    @media (max-width:630px) {
-        .word-btn-inner {padding:6px 7px; font-size:1em;}
-        /* Увеличение размера английского слова на телефоне */
-        .word-btn-inner .english-word {font-size: 1.3em;} /* Увеличено */
-        .word-btn-inner .transcription {font-size: 0.6em;} /* Пропорционально уменьшено */
+     @media (max-width:630px) {
+        .word-btn-inner {
+            padding: 10px 12px; /* Увеличен padding для большей кнопки */
+            font-size: 1.4em; /* Увеличен базовый размер шрифта кнопки */
+        }
+        .english-word {
+            font-size: 1.4em; /* Еще больше увеличен размер английского слова */
+        }
+        .transcription {
+            font-size: 0.95em; /* Пропорционально уменьшено */
+        }
+         .sound-btn {
+             padding: 0 8px; /* Уменьшен padding кнопки звука */
+         }
     }
+    @media (max-width:480px) { /* Дополнительный медиа-запрос для совсем маленьких экранов */
+         .word-btn-inner {
+            padding: 8px 10px;
+            font-size: 1.3em;
+         }
+        .english-word {
+            font-size: 1.3em;
+        }
+        .transcription {
+            font-size: 0.7em;
+        }
+         .sound-btn {
+             padding: 0 6px;
+         }
+    }
+
     @media (max-width:600px){.container{max-width:99vw;} .sentence{font-size:1.09em;} .assembled{font-size:1.03em;}}
   </style>
 </head>
