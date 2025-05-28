@@ -52,7 +52,7 @@
     .theory-title {font-size:1.16em; color:#2a407f; font-weight:bold; margin-bottom:7px;}
     .theory strong {color:#4767b9;}
     .theory .remark {display:block; color:#b96924; margin-top:3px; font-style:italic; font-size:0.98em;}
-    .no-speech {background: #ffeaea; color: #b02323; padding: 12px 10px; border-radius:7px; text-align: center; margin:14px 0;}
+    /* Removed .no-speech style */
 
     /* Медиа-запросы для адаптивности */
      @media (max-width:630px) {
@@ -100,9 +100,7 @@
     <a class="promo-btn" href="https://t.me/+NvMX2DrTa3w1NTVi" target="_blank">Бесплатный урок Английского</a>
   </div>
 
-  <div id="noSpeechWarn" style="display:none;" class="no-speech">
-    📢 <b>Озвучка не поддерживается на этом устройстве или браузере.<br>Проверьте последние версии Google Chrome или Samsung Internet.<br>В Safari на iPhone/iPad работоспособность ограничена. </b>
-  </div>
+  <!-- Removed noSpeechWarn div -->
 
   <div class="sentence" id="russianSentence"></div>
   <div class="assembled" id="assembled"></div>
@@ -112,7 +110,7 @@
   <div class="controls">
     <button class="mini-btn" onclick="clearAssembled()">Сбросить</button>
     <button class="mini-btn" onclick="nextSentence(true)">Другое предложение</button>
-    <button class="mini-btn" onclick="playSound()" title="Озвучить перевод">🔊</button>
+    <!-- Removed sentence play sound button -->
   </div>
   <div class="result" id="result"></div>
   <div class="hint-block" id="hintblock"></div>
@@ -309,7 +307,7 @@ const sentences = [
 ];
 
 let current = 0, assembledWords = [], wordOrder = [], wordOrderParts = [], wordTranscriptions = [];
-let prevIdx = -1, allowInput = true, usedWordByIndex = [], speechAvailable = false;
+let prevIdx = -1, allowInput = true, usedWordByIndex = []; // Removed speechAvailable
 
 const COLOR_CLASSES = {
   question: "question",
@@ -319,44 +317,18 @@ const COLOR_CLASSES = {
   other: "other"
 };
 
-// ---- SPEECH SYNTHESIS ----
-function getVoicesSync(cb) {
-  let voices = window.speechSynthesis.getVoices();
-  if (voices && voices.length) {cb(voices); return;}
-  window.speechSynthesis.onvoiceschanged = function() {
-    voices = window.speechSynthesis.getVoices();
-    cb(voices);
-  };
-}
-function selectEnglishVoice(voices) {
-  return (
-    voices.find(v => v.lang === "en-US" && v.localService) ||
-    voices.find(v => v.lang && v.lang.indexOf("en") === 0) ||
-    voices[0] ||
-    null
-  );
-}
-function playSound(){
-  if(!speechAvailable) return;
-  window.speechSynthesis.cancel();
-  getVoicesSync(function(voices){
-    const utt = new window.SpeechSynthesisUtterance(sentences[current].en);
-    utt.lang = "en-US";
-    utt.rate = 0.7;
-    utt.voice = selectEnglishVoice(voices);
-    window.speechSynthesis.speak(utt);
-  });
-}
+// ---- AUDIO PLAYBACK ----
 function playWord(word){
-  if(!speechAvailable) return;
-  window.speechSynthesis.cancel();
-  getVoicesSync(function(voices){
-    const u = new window.SpeechSynthesisUtterance(word);
-    u.lang = "en-US";
-    u.rate = 0.7;
-    u.voice = selectEnglishVoice(voices);
-    window.speechSynthesis.speak(u);
-  });
+  // Convert to lowercase and remove punctuation (basic)
+  let processedWord = word.toLowerCase().replace(/[^a-z]/g, ''); // Keep only letters
+
+  if (processedWord) { // Only try to play if there's a valid word
+    const audioUrl = `https://wooordhunt.ru/data/sound/sow/us/${processedWord}.mp3`;
+    const audio = new Audio(audioUrl);
+    audio.play().catch(e => console.error("Error playing audio:", e)); // Basic error handling
+  } else {
+     console.warn("Cannot play audio for empty or non-alphabetic word:", word);
+  }
 }
 // --------------------------------
 
@@ -421,7 +393,39 @@ function showSentence(idx) {
   updateButtonsState(); // Обновляем состояние кнопок после их создания
   document.getElementById('hintblock').innerHTML = ''; // Убрана подсказка о типе предложения
 }
-
+// Plays the sentence word by word using Wooordhunt MP3s
+function playSentence(wordsArray) {
+  let idx = 0;
+  function playNext() {
+    if (idx >= wordsArray.length) return;
+    let rawWord = wordsArray[idx];
+    // Clean the word: lowercase, keep only letters
+    let processedWord = rawWord.toLowerCase().replace(/[^a-z]/g, '');
+    if (processedWord) {
+      let audioUrl = `https://wooordhunt.ru/data/sound/sow/us/${processedWord}.mp3`;
+      let audio = new Audio(audioUrl);
+      audio.onended = function() {
+        idx++;
+        playNext();
+      };
+      audio.onerror = function() {
+        // If audio fails, skip to next
+        idx++;
+        playNext();
+      };
+      audio.play().catch(()=>{
+        // On play error (e.g., user interaction required), move on
+        idx++;
+        playNext();
+      });
+    } else {
+      // If invalid word, skip
+      idx++;
+      playNext();
+    }
+  }
+  playNext();
+}
 function selectWord(btn, word, idx) {
   // Логика выбора слова остается прежней - только правильное слово по порядку
   if(!allowInput || btn.classList.contains('used')) return;
@@ -435,10 +439,10 @@ function selectWord(btn, word, idx) {
   document.getElementById('result').innerText = ''; // Очищаем сообщение о результате
   updateButtonsState(); // Обновляем состояние кнопок
 
-  if(assembledWords.length === wordOrder.length) {
-    allowInput = false;
-    playSound();
-    setTimeout(() => checkSentence(true), 300);
+if(assembledWords.length === wordOrder.length) {
+  allowInput = false;
+  playSentence(wordOrder);
+  setTimeout(() => checkSentence(true), 300);
   }
 }
 
@@ -484,7 +488,7 @@ function updateButtonsState() {
       btn.disabled = true;
     } else {
       // Кнопка активна только если это следующее ожидаемое слово и ввод разрешен
-      btn.disabled = !allowInput || btnWord !== expectedWord;
+      btn.disabled = !allowInput || btnWord.toLowerCase().replace(/[^a-z]/g, '') !== expectedWord.toLowerCase().replace(/[^a-z]/g, ''); // Compare processed words
     }
   });
 }
@@ -506,7 +510,7 @@ function checkSentence(autoNext=false) {
   } else {
       document.getElementById('result').innerText = "❌ Ошибка в логике сборки.";
       allowInput = true;
-      clearAssembled(); // Сбрасываем, если ошибка
+      clearAssembled(); // Sбрасываем, если ошибка
   }
 }
 
@@ -517,7 +521,7 @@ function clearAssembled() {
   const btns = document.querySelectorAll('.word-btn');
   btns.forEach(btn => {
       btn.classList.remove('used');
-      btn.disabled = false; // Разблокируем все кнопки
+      // btn.disabled = false; // Moved disabling logic to updateButtonsState
   });
   document.getElementById('assembled').innerHTML = '';
   updateButtonsState(); // Обновляем состояние кнопок по логике (только первое слово активно)
@@ -531,24 +535,9 @@ function nextSentence() {
   showSentence(next);
   document.getElementById('result').innerText = '';
 }
-function checkSpeechSupport() {
-  if (typeof window.speechSynthesis !== "object" || typeof window.SpeechSynthesisUtterance !== "function") {
-    document.getElementById("noSpeechWarn").style.display = "block";
-    speechAvailable = false;
-    return;
-  }
-  getVoicesSync(function(voices){
-    if (!voices || !voices.length) {
-      document.getElementById("noSpeechWarn").style.display = "block";
-      speechAvailable = false;
-    } else {
-      document.getElementById("noSpeechWarn").style.display = "none";
-      speechAvailable = true;
-    }
-  });
-}
+// Removed checkSpeechSupport function
 window.onload = () => {
-  checkSpeechSupport();
+  // checkSpeechSupport(); // Removed call
   showSentence(Math.floor(Math.random()*sentences.length));
 };
 </script>
