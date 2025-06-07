@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тренажёр: Собери английское предложение</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin:0;
+      padding:0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f5fa;
+      min-height:100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 2px 16px rgba(135,152,172,0.18);
+      border-radius:15px;
+      padding: 18px 8px 16px 8px;
+      margin-top:20px;
+      min-height:85vh;
+      display: flex;
+      flex-direction:column;
+      justify-content: flex-start;
+      box-sizing: border-box;
+    }
+    .promo-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px 0 18px 0;
+      border-bottom: 2px solid #e3eaff;
+    }
+    .promo-avatar {
+      border-radius: 50%;
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      margin-bottom: 8px;
+      border: 3px solid #d1e2fa;
+      box-shadow: 0 3px 10px 0 rgba(80,120,200,0.08);
+    }
+    .promo-title {
+      font-size: 1.25em;
+      font-weight: bold;
+      color: #093c7f;
+      margin-bottom: 8px;
+      margin-top: 8px;
+      text-align: center;
+      letter-spacing: 0.15em;
+    }
+    .promo-desc {
+      font-size: 1.06em;
+      color: #215086;
+      margin-bottom: 13px;
+      text-align: center;
+      font-weight: 400;
+      max-width: 355px;
+    }
+    .promo-btn {
+      display: inline-block;
+      background: #1f5bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 32px;
+      font-size: 1.08em;
+      font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 2px 8px 0 #407cf888;
+      margin-top: 5px;
+      margin-bottom: 3px;
+      transition: background .18s;
+    }
+    .promo-btn:hover { background: #3e82fa;}
+    /* --- остальное остается как было --- */
+    h2 {
+      text-align:center;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: #2a4960;
+      font-weight:500;
+    }
+    .divider {
+      border: none;
+      border-top: 2.5px solid #b5cef7;
+      width: 92%;
+      margin: 0 auto 18px auto;
+      opacity: 0.98;
+    }
+    .sentence {
+      font-size: 1.38em;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: bold;
+      color: #23498d;
+      background: #e9f1fc;
+      border-radius: 9px;
+      padding: 15px 10px 13px 10px;
+      box-shadow: 0 1px 7px #dae7ff30;
+      border: 1.5px solid #bddafb;
+      max-width: 96%;
+      margin-left: auto;
+      margin-right: auto;
+      letter-spacing: 0.5px;
+    }
+    .assembled {
+      min-height:40px;
+      border:1.5px dashed #034a7d;
+      border-radius:8px;
+      background:#eaf5ff;
+      color:#232e38;
+      font-size:1.15em;
+      margin-bottom:8px;
+      padding: 9px 5px 7px 8px;
+      word-break: break-word;
+      box-sizing:border-box;
+      font-weight:500;
+      letter-spacing: .5px;
+    }
+    #scheme {
+      text-align:center;
+      color: #d77215;
+      font-style:italic;
+      margin-bottom:14px;
+      margin-top:2px;
+      font-size:1.05em;
+      min-height: 22px;
+      letter-spacing: .4px;
+      user-select: text;
+      font-weight: 500;
+    }
+    .words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom:15px;
+    }
+    .word-cell {
+      display: flex;
+      align-items: center;
+      margin-right: 2px;
+      margin-bottom: 4px;
+    }
+    .word-btn {
+      background: #1d6cf9;
+      color:#fff;
+      border: none;
+      border-radius: 7px;
+      padding: 16px 26px;
+      font-size: 1.5em;
+      margin: 0;
+      cursor: pointer;
+      transition: background .20s, opacity .18s;
+      box-shadow:0 2px 7px #dbeafd66;
+      min-width:65px;
+      min-height:52px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      opacity: 1;
+      text-decoration: none;
+    }
+    .word-btn.used {
+      background: #d1d7e6;
+      color: #5b6b7f;
+      opacity: 0.54;
+      text-decoration: line-through;
+      cursor: default;
+      border: none;
+      box-shadow: none;
+    }
+    .sound-btn {
+      background: #e3f2ff;
+      color: #254696;
+      border: none;
+      border-radius: 7px;
+      padding: 3px 13px;
+      font-size: 1.3em;
+      margin-left: 4px;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: background .17s;
+      box-shadow: none;
+      min-width: 40px;
+      min-height: 40px;
+      font-weight: 400;
+    }
+    .sound-btn:active { background: #c8dbf7;}
+    .result {
+      font-weight: bold;
+      font-size: 1.13em;
+      min-height: 28px;
+      text-align:center;
+      margin-bottom: 8px;
+      color: #0e594d;
+      transition: color .18s;
+    }
+    .hint-block {
+      border-top:1px solid #a3b8d9;
+      padding-top:8px;
+      margin-top: 10px;
+      font-size: 1em;
+      color: #55607d;
+      margin-bottom: 10px;
+    }
+    .hint-block b { color: #1a388b; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: center;
+      margin-top:10px;
+      margin-bottom: 4px;
+    }
+    .mini-btn {
+      background: #26b179;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 20px;
+      font-size: 1.1em;
+      cursor:pointer;
+      transition: background .20s;
+      margin-bottom:2.5px;
+    }
+    .mini-btn:disabled {
+      background:#abd7c8; opacity:.75;
+    }
+    /* Теоретический блок (теперь внизу) */
+    .theory {
+      background: #f5f7ff;
+      color: #26345b;
+      border: 1.5px solid #b1c9ed;
+      border-radius: 10px;
+      padding: 18px 13px 10px 16px;
+      margin: 18px auto 0 auto;
+      font-size: 1.05em;
+      box-shadow: 0 2px 14px #c4d7ef18;
+      max-width: 95%;
+      line-height: 1.63;
+    }
+    .theory-title {
+      font-size: 1.16em;
+      color: #2a407f;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+    .theory strong { color: #4767b9; }
+    .theory .remark {
+      display: block;
+      color: #b96924;
+      margin-top: 3px;
+      font-style: italic;
+      font-size: 0.98em;
+    }
+    /* Медиазапросы для адаптивности (УСИЛИВАЕМ размер для мобильных) */
+    @media (max-width: 600px) {
+      .container {max-width: 99vw; margin:2px auto;}
+      .sentence { font-size:1.2em;} /* Немного увеличил русское предложение */
+      .word-btn {
+         font-size:1.4em; /* Сделал БОЛЬШЕ на средних экранах */
+         padding:14px 10px; /* Скорректировал padding */
+         min-width:45px; min-height:38px; /* Скорректировал мин. размеры */
+      }
+      .sound-btn {
+         font-size:1.25em; /* Сделал БОЛЬШЕ на средних экранах */
+         padding:5px 9px; /* Скорректировал padding */
+         min-width:38px; min-height:38px; /* Скорректировал мин. размеры */
+      }
+      .words { gap: 10px; } /* Чуть уменьшил gap */
+      h2 {font-size:1.11em;}
+      .theory {font-size:0.98em;}
+      .hint-block {font-size:0.97em;}
+      #scheme {font-size:.97em;}
+      .assembled {font-size:1.05em;} /* Чуть увеличил собранное */
+      .promo-title {font-size:1.07em;}
+    }
+    @media (max-width:400px){
+      .container{padding: 7px 1vw;}
+      .sentence {font-size: 1.1em;} /* Еще чуть увеличил русское предложение */
+       .word-btn {
+         font-size: 1.3em; /* Сделал БОЛЬШЕ на маленьких экранах */
+         padding:11px 9px; /* Скорректировал padding */
+         min-width:40px; min-height:35px; /* Скорректировал мин. размеры */
+      }
+      .sound-btn {
+         font-size: 1.1em; /* Сделал БОЛЬШЕ на маленьких экранах */
+         padding:4px 8px; /* Скорректировал padding */
+         min-width:35px; min-height:35px; /* Скорректировал мин. размеры */
+      }
+      .words { gap: 8px; } /* Еще чуть уменьшил gap */
+      .theory {font-size:.93em;}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- РЕКЛАМНЫЙ/ПРИГЛАСИТЕЛЬНЫЙ БЛОК С ФОТО/КНОПКОЙ -->
+  <div class="promo-block">
+    <img class="promo-avatar"
+    src="https://static.tildacdn.info/tild3532-3739-4433-a633-613530366563/-/resize/504x/IMG_7738.PNG" alt="преподаватель">
+    <div class="promo-title">
+      Соберите английское предложение
+    </div>
+    <div class="promo-desc">
+      Очень хорошее упражнение, чтобы начать говорить на английском и понимать его
+    </div>
+    <a class="promo-btn" href="https://t.me/+NvMX2DrTa3w1NTVi" target="_blank">
+      Бесплатный урок Английского
+    </a>
+  </div>
+  <!-- КОНЕЦ РЕКЛАМНОГО БЛОКА -->
+
+  <!-- сам тренажёр -->
+  <div class="sentence" id="russianSentence"></div>
+  <div class="assembled" id="assembled"></div>
+  <div id="scheme"></div>
+  <div class="words" id="words"></div>
+
+  <div class="controls">
+    <button class="mini-btn" onclick="clearAssembled()">Сбросить</button>
+    <button class="mini-btn" onclick="nextSentence(true)">Другое предложение</button>
+    <button class="mini-btn" onclick="playSound()" title="Озвучить перевод">🔊</button>
+  </div>
+  <div class="result" id="result"></div>
+  <div class="hint-block" id="hintblock"></div>
+  <div class="theory">
+    <div class="theory-title">Что такое вспомогательные глаголы?</div>
+    Вспомогательные глаголы (<strong>auxiliary verbs</strong>) — это служебные слова, которые сами по себе не переводятся, но&nbsp;помогают строить <strong>вопросы</strong>, <strong>отрицания</strong> и&nbsp;некоторые времена.<br>
+    <strong>Примеры</strong> (без "have"): <span style="color:#216"><b>do</b></span>, <span style="color:#216"><b>does</b></span>, <span style="color:#216"><b>did</b></span>, <span style="color:#216"><b>will</b></span>, <span style="color:#216"><b>am</b></span>, <span style="color:#216"><b>is</b></span>, <span style="color:#216"><b>are</b></span>, <span style="color:#216"><b>was</b></span>, <span style="color:#216"><b>were</b></span>, <span style="color:#216"><b>can</b></span>, <span style="color:#216"><b>could</b></span>, <span style="color:#216"><b>shall</b></span>, <span style="color:#216"><b>should</b></span>, <span style="color:#216"><b>would</b></span>, <span style="color:#216"><b>must</b></span>.
+    <span class="remark">В каждом предложении ставится только <b>один вспомогательный глагол!</b></span>
+    <br><br>
+    <strong>Как строится вопрос:</strong><br>
+    <ul>
+      <li>Если есть <b>вопросительное слово</b> (What, Where, Why, When, How, Who и др.), оно идёт в самом начале.</li>
+      <li>Затем — <b>вспомогательный глагол</b>, <b>подлежащее</b> и <b>смысловой глагол</b>.</li>
+      <li>Пример с вопросительным словом: <span style="color: #173"><b>Where do you live?</b></span></li>
+      <li>Пример без вопросительного: <span style="color: #173"><b>Do you play football?</b></span></li>
+    </ul>
+    <span class="remark"><b>ВАЖНО!</b> <b>Do, does, did</b> не ставятся в обычном (утвердительном) предложении! Используйте их только для вопросов и отрицаний.<br>
+    Пример (утверждение): I play football.<br>
+    Пример (отрицание): I do not play football.<br>
+    Пример (вопрос): Do you play football?
+    </span>
+  </div>
+</div>
+<script>
+// --- весь JS для тренажёра ---
+const sentences = [
+{ru: "Я удивлён, что они не пришли.", en: "I am surprised that they didn't come."}, {ru: "Я не в курсе этой проблемы.", en: "I am not aware of this issue."}, {ru: "Я готов начать сразу же.", en: "I am ready to start right away."}, {ru: "Я не понимаю вашей логики.", en: "I am not following your logic."}, {ru: "Разве я не должен был позвонить тебе?", en: "Am I not supposed to call you?"}, {ru: "Я иду в правильном направлении?", en: "Am I going in the right direction?"}, {ru: "Правда ли, что я ошибаюсь?", en: "Am I really wrong?"}, {ru: "Он выглядит уставшим после долгого дня.", en: "He is looking tired after the long day."}, {ru: "Это не выполнимо.", en: "It is not feasible."}, {ru: "Она всё ещё занята своими исследованиями.", en: "She is still busy with her research."}, {ru: "Разве это не стоило внимания?", en: "Isn't it worth the attention?"}, {ru: "Разве он не главный подозреваемый?", en: "Isn't he the prime suspect?"}, {ru: "Где находится главный офис?", en: "Where is the main office?"}, {ru: "Важно отметить последствия.", en: "It is important to note the consequences."}, {ru: "Мы заинтересованы в сотрудничестве с вашей компанией.", en: "We are interested in collaborating with your company."}, {ru: "Они не готовы к неожиданным вопросам.", en: "They are not prepared for unexpected questions."}, {ru: "Ты и Джейн всё ещё друзья?", en: "Are you and Jane still friends?"}, {ru: "Где находятся ключи от машины?", en: "Where are the car keys?"}, {ru: "Твои документы готовы?", en: "Are your documents ready?"}, {ru: "Собаки очень взволнованы.", en: "The dogs are very excited."}, {ru: "Разве они не знают правил?", en: "Are they not aware of the rules?"}, {ru: "Она была впечатлена твоей презентацией.", en: "She was impressed by your presentation."}, {ru: "Вчера не было никаких проблем.", en: "There was no problem yesterday."}, {ru: "Он был тем, кто всё начал.", en: "He was the one who started everything."}, {ru: "Где была встреча в прошлую пятницу?", en: "Where was the meeting last Friday?"}, {ru: "Это не было ясно?", en: "Wasn't it clear?"}, {ru: "Я не был вовлечён в этот проект.", en: "I was not involved in this project."}, {ru: "Утро было очень холодным?", en: "Was the morning very cold?"}, {ru: "Они были удивлены результатами теста.", en: "They were surprised by the test results."}, {ru: "Мы не были уверены в его мотивах.", en: "We were not sure of his motives."}, {ru: "Где были все участники мероприятия?", en: "Where were all the event participants?"}, {ru: "Разве они не были готовы к презентации?", en: "Weren't they prepared for the presentation?"}, {ru: "Были ли утеряны ваши солнечные очки?", en: "Were your sunglasses lost?"}, {ru: "Все сотрудники были оповещены заранее.", en: "All the employees were informed in advance."}, {ru: "Разве мы не были там вместе?", en: "Weren't we there together?"}, {ru: "Я уже завершил чтение этой книги.", en: "I have already finished reading this book."}, {ru: "У меня никогда не было такого опыта.", en: "I have never had such an experience."}, {ru: "Я ещё не видел этого фильма.", en: "I haven't seen that movie yet."}, {ru: "Ты когда-нибудь был в Канаде?", en: "Have you ever been to Canada?"}, {ru: "Мы до сих пор не получили ответ.", en: "We have not received an answer yet."}, {ru: "Сколько раз ты уже повторял это упражнение?", en: "How many times have you already repeated this exercise?"}, {ru: "Я только что закончил совещание.", en: "I have just finished the meeting."}, {ru: "К тому времени, как он пришёл, я уже поел.", en: "By the time he arrived, I had already eaten."}, {ru: "У меня никогда не было шанса поприветствовать её.", en: "I had never had the chance to greet her."}, {ru: "Она спросила, был ли я там раньше.", en: "She asked if I had been there before."}, {ru: "Если бы я знал об этом раньше, я бы подготовился.", en: "If I had known about it earlier, I would have prepared."}, {ru: "Я не понимал, почему ты ушёл, пока не услышал объяснение.", en: "I hadn't understood why you left until I heard the explanation."}, {ru: "После того как мы закончили урок, у меня были другие планы.", en: "After we had finished the lesson, I had other plans."}, {ru: "Он спросил, имел ли я все необходимые документы.", en: "He asked whether I had all the necessary documents."}, {ru: "Каждое утро я делаю зарядку.", en: "Every morning I do my exercises."}, {ru: "Ты обычно готовишь ужин сам?", en: "Do you usually cook dinner yourself?"}, {ru: "Она не делает перерыв во время работы.", en: "She does not take a break during work."}, {ru: "Мы делаем заметки на каждой лекции.", en: "We do take notes on every lecture."}, {ru: "Зачем ты это делаешь?", en: "Why do you do that?"}, {ru: "Они не делают этого намеренно.", en: "They do not do it intentionally."}, {ru: "В какие дни ты делаешь уборку?", en: "On which days do you do the cleaning?"}, {ru: "Я вчера переделал весь отчёт.", en: "I did the entire report again yesterday."}, {ru: "Ты действительно видел то здание?", en: "Did you really see that building?"}, {ru: "Она не выполнила своё обещание.", en: "She did not keep her promise."}, {ru: "Мы сделали всё возможное, чтобы помочь.", en: "We did everything possible to help."}, {ru: "Когда ты провёл этот эксперимент?", en: "When did you do this experiment?"}, {ru: "После того как я всё сделал, я ушёл домой.", en: "After I did everything, I went home."}, {ru: "Разве ты не сделал свои дела перед уходом?", en: "Didn't you do your chores before leaving?"}, {ru: "Завтра я закончу проект.", en: "I will finish the project tomorrow."}, {ru: "Ты будешь присутствовать на конференции?", en: "Will you attend the conference?"}, {ru: "Она не будет участвовать в дискуссии.", en: "She will not participate in the discussion."}, {ru: "Мы будем праздновать твой день рождения здесь.", en: "We will celebrate your birthday here."}, {ru: "Разве они не будут рады помочь?", en: "Won't they be happy to help?"}, {ru: "Ты завтра поедешь поездом?", en: "Will you travel by train tomorrow?"}, {ru: "Мой друг возьмёт на себя эту задачу.", en: "My friend will take on this task."}
+];
+let current = 0, assembledWords = [], wordOrder = [], prevIdx = -1, allowInput = true;
+let usedWordByIndex = [];
+
+function playWord(word){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new window.SpeechSynthesisUtterance(word);
+  u.lang="en-US";
+  u.rate = 0.7;
+  const voices = window.speechSynthesis.getVoices();
+  u.voice = voices.find(v=>v.lang && v.lang.startsWith('en')) || null;
+  window.speechSynthesis.speak(u);
+}
+
+function getSentenceType(en) {
+  const base = en.replace(/[.,?!]/g, '').toLowerCase();
+  if (/^(what|where|when|how|why|who|which|whose|whom|are|is|am|does|do|did|will|can|would|should|could|must|was|were)\b/.test(base)) {
+    let begin = "";
+    if (/^(what|where|when|how|why|who|which|whose|whom)\b/.test(base))
+      begin = "Вопр. слово + ";
+    return { type: "Вопрос", hint: `${begin}Вспом.глагол + подлежащее + сказуемое (+ всё остальное)`};
+  }
+  if (/(\bnot\b)|n['’]t/.test(base)) {
+    return { type: "Отрицание", hint: "Подлежащее + вспом.глагол + not + сказуемое (+ всё остальное)" };
+  }
+  return { type: "Утверждение", hint: "Подлежащее + (вспом.глагол) + сказуемое (+ всё остальное)" };
+}
+
+function shuffle(arr) {
+  for(let i = arr.length-1; i > 0; i--) {
+    let j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function showSentence(idx) {
+  current = idx;
+  prevIdx = idx;
+  assembledWords = [];
+  allowInput = true;
+  usedWordByIndex = [];
+  document.getElementById('russianSentence').innerText = sentences[idx].ru;
+  document.getElementById('result').innerText = '';
+  document.getElementById('assembled').innerText = '';
+  const info = getSentenceType(sentences[idx].en);
+  document.getElementById('scheme').innerText = info.hint;
+
+  let words = sentences[idx].en.replace(/[.,?!]/g, '').split(' ');
+  wordOrder = words.slice();
+  let shuffled = words.slice(); shuffle(shuffled);
+
+  let html = '';
+  shuffled.forEach((word, i) => {
+    html += `<span class="word-cell" id="word-cell-${i}">
+      <button class="word-btn" id="word-btn-${i}" type="button" onclick="selectWord(this, '${word.replaceAll("'", "\\'")}',${i})">${word}</button>
+      <button class="sound-btn" onclick="event.stopPropagation();playWord('${word.replaceAll("'", "\\'")}');return false;" title="Прослушать слово">🔊</button>
+    </span>`;
+    usedWordByIndex[i] = false;
+  });
+  document.getElementById('words').innerHTML = html;
+  updateButtonsState();
+  document.getElementById('hintblock').innerHTML =
+    `<b>Тип предложения:</b> ${info.type}`;
+}
+
+function selectWord(btn, word, idx) {
+  if(!allowInput || btn.classList.contains('used')) return;
+  if (word !== wordOrder[assembledWords.length]) {
+    return;
+  }
+  assembledWords.push(word);
+  btn.classList.add('used');
+  usedWordByIndex[idx] = true;
+  document.getElementById('assembled').innerText = assembledWords.join(' ');
+  document.getElementById('result').innerText = '';
+  updateButtonsState();
+
+  if(assembledWords.length === wordOrder.length) {
+    allowInput = false;
+    playSound();
+    setTimeout(() => checkSentence(true), 300);
+  }
+}
+
+function updateButtonsState() {
+  const btns = document.querySelectorAll('.word-btn');
+  let expected = wordOrder[assembledWords.length];
+  btns.forEach((btn, idx) => {
+    if (btn.classList.contains('used')) {
+      btn.disabled = true;
+    } else {
+      btn.disabled = !allowInput || btn.innerText !== expected;
+      btn.classList.remove('used');
+    }
+  });
+  usedWordByIndex.forEach((used, idx) => {
+    let btn = document.getElementById('word-btn-' + idx);
+    if(btn) {
+      if (used) btn.classList.add('used');
+      else btn.classList.remove('used');
+    }
+  });
+}
+
+function checkSentence(autoNext=false){
+  let correct = sentences[current].en.replace(/[.,?!]/g, '').trim().replace(/\s+/g, ' ').toLowerCase();
+  let user = assembledWords.join(' ').trim().toLowerCase();
+
+  if(!user){
+    document.getElementById('result').innerText = "Пожалуйста, соберите предложение.";
+    allowInput = true;
+    updateButtonsState();
+    return;
+  }
+
+  if(user === correct){
+      document.getElementById('result').innerText = "✅ Правильно!";
+      if(autoNext) setTimeout(() => nextSentence(false), 1100);
+  } else {
+      document.getElementById('result').innerText = "❌ Ошибка в логике сборки.";
+      allowInput = true;
+      clearAssembled();
+  }
+}
+
+function clearAssembled() {
+  allowInput = true;
+  assembledWords = [];
+  usedWordByIndex = usedWordByIndex.map(() => false);
+  document.getElementById('assembled').innerText = '';
+  let btns = document.querySelectorAll('.word-btn');
+  btns.forEach(b => {
+    b.disabled = false;
+    b.classList.remove('used');
+  });
+  updateButtonsState();
+  document.getElementById('result').innerText = '';
+}
+
+function nextSentence(direct=false) {
+  let next;
+  do {
+    next = Math.floor(Math.random() * sentences.length);
+  } while(next === prevIdx && sentences.length>1);
+  showSentence(next);
+  document.getElementById('result').innerText = '';
+}
+
+function playSound(){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new window.SpeechSynthesisUtterance(sentences[current].en);
+  utt.lang = "en-US";
+  utt.rate = 0.7;
+  const voices = window.speechSynthesis.getVoices();
+  utt.voice = voices.find(v=>v.lang && v.lang.startsWith('en')) || null;
+  window.speechSynthesis.speak(utt);
+}
+
+window.onload = () => {
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = function(){};
+  }
+  showSentence(Math.floor(Math.random()*sentences.length));
+};
+</script>
+</body>
+</html>
