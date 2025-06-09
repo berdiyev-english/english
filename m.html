@@ -334,12 +334,12 @@
     <div class="theory-title">Что такое Помощники?</div>
     Помощники (<strong>auxiliary verbs</strong>) — это служебные слова, которые сами по себе не переводятся, но&nbsp;помогают строить <strong>вопросы</strong>, <strong>отрицания</strong> и&nbsp;некоторые времена.<br>
     <strong>Примеры</strong> : <span style="color:#216"><b>do</b></span>, <span style="color:#216"><b>did</b></span>, <span style="color:#216"><b>will</b></span>, <span style="color:#216"><b>am</b></span>, <span style="color:#216"><b>is</b></span>, <span style="color:#216"><b>are</b></span>, <span style="color:#216"><b>was</b></span>, <span style="color:#216"><b>were</b></span>.
-    <span class="remark">В каждом предложении ставится только <b>один вспомогательный глагол!</b></span>
+    <span class="remark">В каждом предложении ставится только <b>один помощник!</b></span>
     <br><br>
     <strong>Как строится вопрос:</strong><br>
     <ul>
       <li>Если есть <b>вопросительное слово</b> (What, Where, Why, When, How, Who и др.), оно идёт в самом начале.</li>
-      <li>Затем — <b>вспомогательный глагол</b>, <b>подлежащее</b> и <b>смысловой глагол</b>.</li>
+      <li>Затем — <b>помощник</b>, <b>подлежащее</b> и <b>смысловой глагол</b>.</li>
       <li>Пример с вопросительным словом: <span style="color: #173"><b>Where do you live?</b></span></li>
       <li>Пример без вопросительного: <span style="color: #173"><b>Do you play football?</b></span></li>
     </ul>
@@ -404,9 +404,9 @@ function getSentenceType(en) {
     return { type: "Вопрос", hint: `${begin}Помощник + существительное + глагол (+ всё остальное)`};
   }
   if (/(\bnot\b)|n['’]t/.test(base)) {
-    return { type: "Отрицание", hint: "Существительное + вспом.глагол + not + глагол (+ всё остальное)" };
+    return { type: "Отрицание", hint: "Существительное + помощник + not + глагол (+ всё остальное)" };
   }
-  return { type: "Утверждение", hint: "Существительное + (вспом.глагол) + глагол (+ всё остальное)" };
+  return { type: "Утверждение", hint: "Существительное + помощник (did,do не ставим , но они могут быть обычными глаголами тут) + глагол (+ всё остальное)" };
 }
 
 function shuffle(arr) {
