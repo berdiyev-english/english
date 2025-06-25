@@ -1,7 +1,7 @@
 {
   "name": "Английский с нуля",
   "short_name": "B-ENG:Английский с нуля",
-  "start_url": "/english/",
+  "start_url": "/./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
